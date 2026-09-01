@@ -1,0 +1,21 @@
+# Glossary
+
+- Workspace: one organisation's account. Every MCP connection is bound to one workspace.
+- Campaign: the unit you generate, publish and measure. Has a goal, products, variants and deployments. Status: generating, review, active, paused, ended, failed.
+- Variant: one creative inside a campaign. Adaptive CVG picks among active variants.
+- Squid: the conversational ad a campaign renders. Parts: kicker, headline, body, CTA pill, up to six chips, chat.
+- Chips: suggested questions under the chat. Spend them on questions customers actually ask.
+- Adaptive CVG: the selection engine that shows the winning variant more often once it has evidence. Needs traffic before it can learn.
+- Surface: a place a campaign appears. Types include web, retail, transit, stadium, indoor_display, point_of_sale, lobby, ar.
+- Zone: a group of surfaces with a selection strategy (priority-only, round-robin, weighted, zone-coordinated). Assign a campaign to a zone and every surface in it updates.
+- Deployment: a campaign placed on a surface or zone, with priority and status (scheduled, active, paused, ended).
+- Publish: make the campaign's page live on the edge and the brand page. `visibility: public` is what lets the edge serve the public campaign page.
+- Brand page: the public home at `<name>.sparkletree.io` or a custom domain. Published campaigns appear there automatically. Serves `/llms.txt`, `/ask` and other public agent surfaces without auth.
+- Brand book: visual identity (logo, colors, fonts, imagery) and voice guidelines (tone, personality, dos, donts, messaging rules).
+- Concierge: the brand's `/ask` assistant, configured through `manage_brand` `update_concierge` (chips, facts, FAQ, policies).
+- Impressions: raw delivery count, one per load. Reloads inflate it.
+- Reach: distinct sessions that saw the campaign. Per tab, cleared on close.
+- CTR (sessions): clicks over sessions reached. The number to compare creatives on.
+- Credits: the workspace's monthly pool for AI generation and rendering. Blocked actions return `precondition_failed`; published campaigns keep serving.
+- Profile: the set of tools a connection sees. Selected by a call code, not a name. Visibility only, never permission.
+- Call code: the operator-issued secret appended as `?profile=<code>`.
