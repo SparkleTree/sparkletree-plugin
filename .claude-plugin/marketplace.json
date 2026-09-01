@@ -1,0 +1,17 @@
+{
+  "name": "sparkletree",
+  "owner": {
+    "name": "SparkleTree",
+    "email": "support@sparkletree.io",
+    "url": "https://sparkletree.io"
+  },
+  "description": "SparkleTree plugin marketplace",
+  "plugins": [
+    {
+      "name": "sparkletree",
+      "source": "./",
+      "description": "Create, publish and measure SparkleTree campaigns from your AI.",
+      "category": "marketing"
+    }
+  ]
+}

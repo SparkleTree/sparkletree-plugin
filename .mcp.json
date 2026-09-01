@@ -1,0 +1,6 @@
+{
+  "sparkletree": {
+    "type": "http",
+    "url": "https://app.sparkletree.io/api/mcp"
+  }
+}
