@@ -3,3 +3,5 @@
 node_modules/
 .DS_Store
 evals/results/
+key.pem
+mcp-registry-auth
