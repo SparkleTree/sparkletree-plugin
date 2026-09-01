@@ -13,7 +13,7 @@
     ],
     "PreToolUse": [
       {
-        "matcher": "mcp__(plugin_sparkletree_)?sparkletree__(generate_campaign|render_video|video_commission|manage_campaigns)",
+        "matcher": "mcp__.*__(generate_campaign|render_video|video_commission|manage_campaigns)$",
         "hooks": [
           {
             "type": "command",

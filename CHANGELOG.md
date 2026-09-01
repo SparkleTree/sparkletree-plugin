@@ -9,7 +9,7 @@ First version of the plugin.
 - Manifest, one-plugin marketplace, MCP server declaration for `https://app.sparkletree.io/api/mcp`.
 - Eight model-invocable skills (`sparkletree`, `launch-campaign`, `review-variants`, `brand-voice-sync`, `surfaces-and-embed`, `video-from-winner`, `agency-workspaces`, `troubleshoot-connection`) and four user-invoked commands (`setup`, `launch`, `digest`, `status`).
 - Two read-only agents: `campaign-reviewer`, `analytics-digest`.
-- Session-start health check and a pre-tool spend guard, both POSIX sh without dependencies.
+- Session-start health check and a pre-tool spend guard, both POSIX sh without dependencies. The guard matches the four spend and destructive tools under any MCP server name, because Claude Code drops the plugin's server when a claude.ai connector for the same URL is present and the tools then carry the connector's id.
 - Eval cases for every model-invocable skill, plus a `claude -p` fallback runner.
 - `server.json` for the official MCP registry (`io.sparkletree/sparkletree`), `gemini-extension.json`, and an OpenAI skills-only bundle generated from the same skills.
 
