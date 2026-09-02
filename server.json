@@ -6,7 +6,7 @@
   "version": "1.0.1",
   "websiteUrl": "https://sparkletree.io",
   "repository": {
-    "url": "https://gitlab.com/sparkletree-ai/sparkletree-plugin",
+    "url": "https://gitlab.com/sparkletree/sparkletree-plugin",
     "source": "gitlab"
   },
   "remotes": [
