@@ -1,6 +1,6 @@
 # React SDK reference
 
-Packages: `@sparkletree/core` (framework-agnostic wire and copy choreography), `@sparkletree/react` (provider, hooks, components), `@sparkletree/cli` (`npx @sparkletree/cli add hero cta` copies component source into the repo in the shadcn style; `sparkletree upgrade` ports older copies). Repo: https://github.com/SparkleTree/sparkletree-sdk.
+Packages: `@sparkletree/core` (framework-agnostic wire and copy choreography), `@sparkletree/react` (provider, hooks, components), `@sparkletree/cli` (`npx @sparkletree/cli add hero cta` copies component source into the repo in the shadcn style; `sparkletree upgrade` ports older copies). Repo: https://gitlab.com/sparkletree/sparkletree-sdk.
 
 ## Minimum integration
 

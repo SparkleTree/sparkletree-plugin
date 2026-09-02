@@ -3,11 +3,11 @@
   "name": "io.sparkletree/sparkletree",
   "title": "SparkleTree",
   "description": "Create, publish and measure SparkleTree marketing campaigns from an AI client. OAuth 2.1 with PKCE.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "websiteUrl": "https://sparkletree.io",
   "repository": {
-    "url": "https://github.com/SparkleTree/sparkletree-plugin",
-    "source": "github"
+    "url": "https://gitlab.com/sparkletree-ai/sparkletree-plugin",
+    "source": "gitlab"
   },
   "remotes": [
     {

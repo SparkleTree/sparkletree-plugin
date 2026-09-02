@@ -49,7 +49,7 @@ Point the client at `https://app.sparkletree.io/api/mcp` over streamable HTTP. A
 
 ### Gemini CLI
 
-`gemini extensions install https://github.com/SparkleTree/sparkletree-plugin`. The manifest is `gemini-extension.json`.
+`gemini extensions install https://gitlab.com/sparkletree-ai/sparkletree-plugin`. The manifest is `gemini-extension.json`.
 
 ## What is in the plugin
 

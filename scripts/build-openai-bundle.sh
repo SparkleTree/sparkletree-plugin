@@ -55,7 +55,7 @@ cat > "$out/.claude-plugin/plugin.json" <<'JSON'
     "url": "https://sparkletree.io"
   },
   "homepage": "https://sparkletree.io",
-  "repository": "https://github.com/SparkleTree/sparkletree-plugin",
+  "repository": "https://gitlab.com/sparkletree-ai/sparkletree-plugin",
   "license": "MIT",
   "keywords": ["sparkletree", "marketing", "campaigns", "analytics", "mcp", "brand", "video", "signage"]
 }
