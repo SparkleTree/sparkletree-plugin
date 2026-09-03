@@ -1,6 +1,6 @@
 ---
 name: launch
-description: SparkleTree campaign launch command, /sparkletree:launch <product URL or goal>. Runs the launch-campaign skill end to end with the argument as the starting point, shows the brief for approval before generating, and finishes with a live campaign URL or a clear reason it stopped.
+description: SparkleTree campaign launch command, /sparkletree:launch [product URL or goal]. Runs the launch-campaign skill end to end with the argument as the starting point, shows the brief for approval before generating, and finishes with a live campaign URL or a clear reason it stopped.
 disable-model-invocation: true
 argument-hint: "[product URL or goal]"
 ---

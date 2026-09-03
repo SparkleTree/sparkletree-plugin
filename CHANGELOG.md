@@ -5,6 +5,7 @@ Any change to a tool schema on the server bumps the plugin version, gets a note 
 ## 0.1.1
 
 - Stop committing the generated `openai/` bundle. Its nested `.claude-plugin/plugin.json` made the claude.ai and Claude desktop marketplace importer reject the plugin with "plugin.json must be at .claude-plugin/plugin.json at the plugin root; found nested". `scripts/build-openai-bundle.sh` still produces it, gitignored, for the OpenAI zip.
+- `launch` skill description no longer uses angle brackets; the claude.ai importer flags them as XML.
 - Install docs: the Claude Code marketplace command now uses the full GitLab URL (the `owner/repo` shorthand only resolves GitHub), and the claude.ai / desktop plugin route is documented.
 
 ## 0.1.0 (unreleased)
