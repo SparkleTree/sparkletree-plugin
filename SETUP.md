@@ -11,9 +11,11 @@ Sign up at https://app.sparkletree.io/sign-up. Onboarding creates your workspace
 Claude Code:
 
 ```
-/plugin marketplace add SparkleTree/sparkletree-plugin
+/plugin marketplace add https://gitlab.com/sparkletree/sparkletree-plugin.git
 /plugin install sparkletree@sparkletree
 ```
+
+Claude.ai and Claude desktop: Customize, Plugins, Add, Add marketplace, Add from a repository, paste the same GitLab URL, Sync, then install `sparkletree` from Browse.
 
 Other hosts: see the install section of the [README](README.md).
 

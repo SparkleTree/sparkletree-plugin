@@ -4,6 +4,8 @@
 # keep .claude-plugin/plugin.json with a description, skills/<name>/SKILL.md,
 # convert agents to skills, replace Claude-specific wording with "the model",
 # drop marketplace.json, .mcp.json and hooks. Do not edit openai/ by hand.
+# openai/ is gitignored on purpose: a committed nested .claude-plugin/plugin.json
+# makes the claude.ai / Claude desktop marketplace importer reject the plugin.
 set -eu
 root=$(cd "$(dirname "$0")/.." && pwd)
 out="$root/openai"

@@ -19,13 +19,17 @@ You need a SparkleTree workspace. Create one at https://app.sparkletree.io/sign-
 ### Claude Code
 
 ```
-/plugin marketplace add SparkleTree/sparkletree-plugin
+/plugin marketplace add https://gitlab.com/sparkletree/sparkletree-plugin.git
 /plugin install sparkletree@sparkletree
 ```
 
-Then `/mcp`, choose sparkletree, and sign in with your SparkleTree account in the browser. Run `/sparkletree:setup` for a guided first half hour.
+The full GitLab URL is required; the `owner/repo` shorthand only resolves GitHub. Then `/mcp`, choose sparkletree, and sign in with your SparkleTree account in the browser. Run `/sparkletree:setup` for a guided first half hour.
 
 To try it without installing: `claude --plugin-dir ./sparkletree-plugin` from a clone.
+
+### Claude.ai and Claude desktop (plugin)
+
+Customize, Plugins, Add, Add marketplace, Add from a repository. Paste `https://gitlab.com/sparkletree/sparkletree-plugin.git`, choose the "Use" row that appears, and press Sync. The `sparkletree` plugin then shows under Browse for that marketplace; install it there. The MCP server inside the plugin asks you to sign in with your SparkleTree account on first use.
 
 ### Skills only, any agent that reads Agent Skills
 
@@ -35,9 +39,9 @@ npx skills add SparkleTree/sparkletree-plugin
 
 This installs the skills without the MCP server declaration, hooks or agents. Add the connector in your client separately (below).
 
-### Claude.ai and Claude desktop
+### Claude.ai and Claude desktop (connector only)
 
-Settings, Connectors, Add custom connector, paste `https://app.sparkletree.io/api/mcp`, approve, sign in. SparkleTree is not yet in Anthropic's connector directory, so the custom connector is the route today.
+If you want only the MCP tools without the skills: Settings, Connectors, Add custom connector, paste `https://app.sparkletree.io/api/mcp`, approve, sign in. SparkleTree is not yet in Anthropic's connector directory, so the custom connector is the route today.
 
 ### ChatGPT
 
