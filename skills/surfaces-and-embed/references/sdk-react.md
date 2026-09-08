@@ -16,16 +16,18 @@ import { SparkletreeProvider, Hero, Cta } from "@sparkletree/react";
 </SparkletreeProvider>
 ```
 
-Self-hosting passes `apiBase` and `organizationId` instead of `publishableKey`.
+Self-hosting can pass `apiBase` and `organizationId` explicitly, but `publishableKey` is still required: the server refuses to stream without one.
 
 ## Before the first request works
 
 | Needed | Source |
 |---|---|
-| `publishableKey` | Dashboard. `st_pk_live_...`, decoded locally, not a credential |
+| `publishableKey` | Dashboard. A signed credential, required on every request. `st_pk_test_...` works on its own for local development; `st_pk_live_...` only works from a registered origin. Visible in page source, so protection is the origin registry plus rate limits; rotate from the dashboard if it leaks |
 | `campaignId` | Dashboard, or `query_campaigns` `action: list`. `surfaceId` may be used instead when a surface decides what plays |
-| Allowed origin | Register the site origin per workspace; wildcards rejected; plain http only for localhost |
+| Allowed origin (live keys) | Register the site origin per workspace; wildcards rejected. Plain-http localhost is not admitted for live keys; use a test key locally |
 | CSP | `connect-src` the API base; `img-src` and `media-src` the CDN origin; Spotify script and frame sources only if `mountAudio` is used |
+
+If the stream falls back: in log mode the response carries `x-st-auth: <reason>` (`missing_key`, `unsigned`, `bad_signature`, `org_mismatch`, `missing_origin`, `origin_not_allowed`, ...); in required mode it is a 401 with JSON `{ "error": "unauthorized", "reason": ..., "remedy": ... }` and `remedy` says what to fix.
 
 No CSS ships. `.st-hero`, `.st-cta`, `.st-stream-text`, `.st-mark` are hooks for the site's own styles.
 

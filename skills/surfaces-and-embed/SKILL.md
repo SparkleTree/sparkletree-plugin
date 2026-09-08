@@ -32,9 +32,9 @@ The Squid renders in place, served from the edge, showing the variant Adaptive C
 
 1. Detect: `package.json` has `next` or `react`. Confirm the package manager from the lockfile.
 2. Install: `npm install @sparkletree/core @sparkletree/react` (or the pnpm/yarn equivalent). Alternatively `npx @sparkletree/cli add hero cta` copies the component source into the repo; do one or the other, not both.
-3. Provider: one `SparkletreeProvider` per page view with `publishableKey` from the dashboard (`st_pk_live_...`; it encodes the org id and API base, it is an address, not a secret).
+3. Provider: one `SparkletreeProvider` per page view with `publishableKey` from the dashboard (`st_pk_test_...` locally, `st_pk_live_...` in production). The key is a signed credential minted in the dashboard and required on every request; it is visible in page source, so protection comes from the origin registry and rate limits.
 4. Island: replace the real hero or CTA in the real component with `<Hero campaignId="..." fallback={{ headline: current, body: current }} />` or `<Cta campaignId="..." fallback={{ cta: current }} href="..." />`. `fallback` is required and must be the copy the page ships today; it is what a visitor reads if the network is slow or the campaign is paused.
-5. Origin: the site's origin must be registered on the workspace or every request fails CORS (`POST /api/organizations/{orgId}/embed-origins` with `{ "origin": "https://site" }`, or Settings in the dashboard). Localhost over plain http is allowed.
+5. Origin: live keys only work from an origin registered on the workspace, otherwise every request fails (`POST /api/organizations/{orgId}/embed-origins` with `{ "origin": "https://site" }`, or Settings in the dashboard). Localhost over plain http is not admitted for live keys; use a test key locally, it needs no registered origin.
 6. Verify degrade first: point at an unreachable `apiBase`, load the page, confirm the fallback renders and `phase` is `failed`. Then verify the happy path.
 
 Details, props, Next.js App Router notes and CSP lines: `references/sdk-react.md`.
