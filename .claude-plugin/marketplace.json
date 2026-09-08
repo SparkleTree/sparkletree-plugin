@@ -5,7 +5,7 @@
     "email": "support@sparkletree.io",
     "url": "https://sparkletree.io"
   },
-  "description": "SparkleTree plugin marketplace",
+  "description": "SparkleTree plug-in marketplace",
   "plugins": [
     {
       "name": "sparkletree",
