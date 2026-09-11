@@ -9,6 +9,7 @@ You need a SparkleTree workspace. Create one at https://app.sparkletree.io/sign-
 - "Show me what's in my SparkleTree workspace: which campaigns are live and what's my top performer this week?"
 - "Import the product at https://example.com/products/aurora-lamp and draft a campaign brief for it. Show me the brief before generating anything."
 - "How did my campaigns perform in the last 7 days? Which variant is winning, and what one change would you make?"
+- "Each morning at 6, scan the internet for the day's dominant meme and rewrite the hero body of my Aurora Lamp campaign to make a joke about it. Show me the first one before it goes live." (`/sparkletree:adapt` does this; the schedule runs in your host, the change is a free write, and every run reports old versus new.)
 
 <!-- SCREENSHOT PLACEHOLDER 1: assets/listing/inspector-campaign-list.png. The campaign inspector rendering a query_campaigns list in Claude.ai (status badges, paging). Capture from a real session; do not fabricate. -->
 
@@ -62,7 +63,7 @@ Point the client at `https://app.sparkletree.io/api/mcp` over streamable HTTP. A
 | MCP server `sparkletree` | `https://app.sparkletree.io/api/mcp`, 15 tools: read tools for campaigns, products, surfaces, brand, analytics, video and commissions; write tools for the same; `generate_campaign` and `render_video`. Reads are marked read-only. |
 | Skill `sparkletree` | How to work in a workspace: read `mosaic://capabilities` first, read before write, confirm before publish, deploy, delete or credit spend. |
 | Skills `launch-campaign`, `review-variants`, `brand-voice-sync`, `surfaces-and-embed`, `video-from-winner`, `agency-workspaces`, `troubleshoot-connection` | One job each, from product URL to live link, variant critique, brand book setup, website and screen deployment (including the React SDK), video, multi-workspace operations, connection problems. |
-| Commands `/sparkletree:setup`, `:launch`, `:digest`, `:status` | Guided setup, launch from an argument, weekly analytics digest, workspace status. Only you can run these. |
+| Commands `/sparkletree:setup`, `:launch`, `:digest`, `:status`, `:adapt` | Guided setup, launch from an argument, weekly analytics digest, workspace status, and a one-sentence live change to a campaign or the brand page, once or on a schedule. Only you can run these. |
 | Agents `campaign-reviewer`, `analytics-digest` | Read-only subagents. They return verdicts and proposals; the main conversation confirms and writes. |
 | Hook: session start | A two-second health check of the server. Silent when it answers; one line when it does not. Never blocks. |
 | Hook: spend guard | Before `generate_campaign`, `render_video`, `video_commission` create/approve/revise/cancel and `manage_campaigns` publish/deploy/delete, Claude Code asks you first and says what the call spends or changes. Reads are never intercepted. |

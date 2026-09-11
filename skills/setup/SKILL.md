@@ -38,4 +38,4 @@ Offer, in this order, and do only what the user picks:
 
 Tell the user, once: reads are free; publish, deploy, delete and anything that generates or renders asks first (this plugin adds a hook that asks as well); credits come from the workspace's monthly pool; everything runs under their own account and role; removing the connector or the plugin ends access.
 
-Point to `/sparkletree:launch`, `/sparkletree:digest`, `/sparkletree:status` and, if something fails, `skills/troubleshoot-connection`.
+Point to `/sparkletree:launch`, `/sparkletree:digest`, `/sparkletree:status`, `/sparkletree:adapt` (a one-sentence live change, once or on a schedule) and, if something fails, `skills/troubleshoot-connection`.

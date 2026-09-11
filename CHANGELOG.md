@@ -2,6 +2,10 @@
 
 Any change to a tool schema on the server bumps the plugin version, gets a note here for the OpenAI re-review, and is batched into a Cursor release.
 
+## 0.1.2
+
+- New command `/sparkletree:adapt [what should change, and when]`: one sentence becomes a live change to campaign copy, the active variant, the concierge or the brand voice, applied once now or as a scheduled task the host runs. Free writes only, brand content rules checked before every write, old versus new in every report. README and the Codex `defaultPrompt` list carry the example phrase.
+
 ## 0.1.1
 
 - `.codex-plugin/plugin.json` for Codex and the OpenAI plugin portal, with `assets/icon.webp` (180 by 180).

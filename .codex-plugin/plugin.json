@@ -1,6 +1,6 @@
 {
   "name": "sparkletree",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Create, publish and measure SparkleTree campaigns from your AI: skills for the campaign craft, a read-only reviewer and digest agent, a spend guard, and the SparkleTree MCP server.",
   "author": {
     "name": "SparkleTree",
@@ -39,7 +39,8 @@
     "defaultPrompt": [
       "Use SparkleTree to create a new campaign",
       "Add a new product to SparkleTree",
-      "Check in on my brand presence with SparkleTree"
+      "Check in on my brand presence with SparkleTree",
+      "Each morning at 6, find the internet's meme of the day and rewrite my campaign hero to joke about it"
     ],
     "brandColor": "#56F1B0",
     "composerIcon": "./assets/icon.webp",
