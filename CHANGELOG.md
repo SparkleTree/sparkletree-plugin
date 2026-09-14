@@ -4,6 +4,7 @@ Any change to a tool schema on the server bumps the plugin version, gets a note 
 
 ## 0.1.2
 
+- Registry `server.json` 1.0.2: the live server gained brand pages (`manage_brand` actions `create_page`, `publish_page`, `revert_page`; `query_brand` action `get_page`; resource `mosaic://brand-page-guide`) and `manage_campaigns` action `generate_playbook` after registry 1.0.1 was published on 2026-09-02.
 - New command `/sparkletree:adapt [what should change, and when]`: one sentence becomes a live change to campaign copy, the active variant, the concierge or the brand voice, applied once now or as a scheduled task the host runs. Free writes only, brand content rules checked before every write, old versus new in every report. README and the Codex `defaultPrompt` list carry the example phrase.
 
 ## 0.1.1
