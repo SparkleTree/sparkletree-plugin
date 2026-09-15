@@ -1,0 +1,72 @@
+# SparkleTree plugin CI. Lives at the plugin repo root as .gitlab-ci.yml
+# (gitlab.com/sparkletree/sparkletree-plugin); this copy is the paste source.
+#
+# validate: manifest, version and layout checks on every push (scripts/ci-validate.sh).
+# publish-registry: on main, prove the registry credential every time and publish
+# server.json to the official MCP registry (io.sparkletree/sparkletree) whenever
+# its version is ahead of the registry's latest. Bump server.json together with
+# MCP_SERVER_VERSION in the monorepo (mosaic/lib/mcp/version.ts); the monorepo's
+# mcp-version-sync job fails an MR while the two differ.
+#
+# Needs one protected, masked CI variable: MCP_REGISTRY_ED25519_KEY_B64, the
+# base64 (single line) of the ed25519 private key PEM whose public key is served
+# at https://sparkletree.io/.well-known/mcp-registry-auth (source of truth:
+# Infisical dev MCP_REGISTRY_ED25519_KEY). Publishing docs live in the monorepo
+# at docs/plugin-submissions/official-mcp-registry.md.
+
+workflow:
+  rules:
+    - if: $CI_COMMIT_BRANCH
+
+stages:
+  - validate
+  - publish
+
+default:
+  image: alpine:3.20
+  interruptible: true
+
+variables:
+  MCP_PUBLISHER_VERSION: "v1.8.1"
+  REGISTRY_VERSIONS_URL: "https://registry.modelcontextprotocol.io/v0/servers/io.sparkletree%2Fsparkletree/versions"
+
+validate:
+  stage: validate
+  script:
+    - apk add --no-cache jq >/dev/null
+    - sh scripts/ci-validate.sh
+
+publish-registry:
+  stage: publish
+  needs:
+    - validate
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+  script:
+    - apk add --no-cache curl jq openssl >/dev/null
+    - VERSION=$(jq -r .version server.json)
+    - LATEST=$(curl -fsS --retry 3 "$REGISTRY_VERSIONS_URL" | jq -r '.servers[] | select(._meta["io.modelcontextprotocol.registry/official"].isLatest == true) | .server.version')
+    - PUBLISHED=$(curl -fsS --retry 3 "$REGISTRY_VERSIONS_URL" | jq -r '.servers[].server.version')
+    - echo "server.json $VERSION; registry latest $LATEST"
+    - '[ -n "${MCP_REGISTRY_ED25519_KEY_B64:-}" ] || { echo "CI variable MCP_REGISTRY_ED25519_KEY_B64 is not set (Settings > CI/CD > Variables, protected + masked)"; exit 1; }'
+    - curl -fsSL --retry 3 "https://github.com/modelcontextprotocol/registry/releases/download/${MCP_PUBLISHER_VERSION}/mcp-publisher_linux_amd64.tar.gz" | tar xz mcp-publisher
+    - echo "$MCP_REGISTRY_ED25519_KEY_B64" | base64 -d > /tmp/key.pem
+    - PRIVATE_KEY=$(openssl pkey -in /tmp/key.pem -noout -text | grep -A3 'priv:' | tail -n +2 | tr -d ' :\n')
+    - rm -f /tmp/key.pem
+    # Log in on every main pipeline so a broken credential shows up before the next real release.
+    - ./mcp-publisher login http --domain sparkletree.io --private-key "$PRIVATE_KEY"
+    - PRIVATE_KEY=""
+    - |
+      if [ "$VERSION" = "$LATEST" ]; then
+        echo "registry already at $VERSION; nothing to publish"
+        exit 0
+      fi
+      if echo "$PUBLISHED" | grep -qx "$VERSION"; then
+        echo "server.json $VERSION is already published but is not the latest ($LATEST); bump server.json past $LATEST"
+        exit 1
+      fi
+    - ./mcp-publisher publish
+    - sleep 5
+    - NOW=$(curl -fsS --retry 3 "$REGISTRY_VERSIONS_URL" | jq -r '.servers[] | select(._meta["io.modelcontextprotocol.registry/official"].isLatest == true) | .server.version')
+    - '[ "$NOW" = "$VERSION" ] || { echo "published, but the registry reports latest $NOW, expected $VERSION"; exit 1; }'
+    - echo "published io.sparkletree/sparkletree $VERSION"
