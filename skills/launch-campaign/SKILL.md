@@ -33,6 +33,8 @@ If generation fails, read the error remedy. `mode: regenerate` from the failing 
 
 `query_campaigns` `action: variants` on the new campaign. Hand the variants to the `sparkletree:campaign-reviewer` agent when available, or run `skills/review-variants` yourself. Present the findings as a diff-style list. Apply approved edits with `manage_campaigns` `action: update_variant`. Saves republish automatically.
 
+A generated campaign already carries its conversational playbook (the chat opening, product facts, FAQs and question chips the Squid answers with). A campaign made by hand with `manage_campaigns` `action: create` has none; publishing adds one automatically, and `manage_campaigns` `action: generate_playbook` with the `campaignId` writes or rewrites it on demand after product or variant edits. Free, no credits.
+
 ## 5. Publish and deploy
 
 Ask which surface. `query_surfaces` `operation: list_surfaces` (and `list_zones`) to find it by name. Then, after one combined confirmation naming the campaign, the surface and the visibility:

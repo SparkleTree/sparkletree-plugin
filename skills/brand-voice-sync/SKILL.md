@@ -46,3 +46,13 @@ Edge caches invalidate in the same call. Published campaign pages bake visuals a
 ## 5. Verify
 
 `query_brand` `action: get` again and read the result back in two lines. If the brand page is published, its `/llms.txt` and `/ask` now answer with the new facts; suggest one test question.
+
+## 6. The brand home page, if the user wants it authored
+
+The brand host (`<slug>.sparkletree.io` or the custom domain) renders a default home page from the brand book. An agent can replace it with one hand-authored HTML document. Only do this when the user asks for it; the default render is fine for most workspaces.
+
+1. `query_brand` `action: get_page`: the live state, every stored version with its preview URL, and the agent guide. The same guide is the resource `mosaic://brand-page-guide`. Read it before writing: it carries the palette, the live campaign ids, the relative embed and link paths the edge serves, and the rules.
+2. Write one complete, self-contained HTML document (doctype to closing html tag, 1 MiB at most). Use only the paths the guide names for campaign embeds and links; nothing external that the page cannot live without.
+3. `manage_brand` `action: create_page` with `html` and a short `notes` line. Without `publish` it stores a draft and returns a signed preview URL on the real host; the member role is enough for a draft. Show the user the preview URL and wait.
+4. On yes, `manage_brand` `action: publish_page` with the `pageId` from the draft (or `create_page` with `publish: true` when the user has already approved the HTML). Admin role. The edge is invalidated in the same call and the response carries the live URL.
+5. `manage_brand` `action: revert_page` puts the default render back. Stored versions stay listed under `get_page` and can be published again.

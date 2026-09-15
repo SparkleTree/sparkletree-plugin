@@ -21,6 +21,7 @@ Map the sentence to exactly one write and read its current state first:
 | Which variant runs | `query_campaigns` `action: variants` | `manage_campaigns` `action: update_variant` with `isActive` |
 | Brand page answers, chips, facts, FAQ | `query_brand` `action: get` | `manage_brand` `action: update_concierge` |
 | Brand voice, tagline, dos and donts | `query_brand` `action: get` | `manage_brand` `action: update_voice` or `update_brandbook` |
+| The brand home page itself (an agent-authored page) | `query_brand` `action: get_page` | `manage_brand` `action: create_page` as a draft, then `publish_page` on approval; `revert_page` restores the default. See `skills/brand-voice-sync` section 6. |
 
 Name the campaign or brand subtree by name and id and echo it back. Brand writes need the admin role; if the user is not an admin, prepare the text and hand it over instead. Never target `generate_campaign`, `render_video` or `video_commission` from this command: they spend credits and a scheduled run cannot answer the spend hook.
 

@@ -2,6 +2,10 @@
 
 Any change to a tool schema on the server bumps the plugin version, gets a note here for the OpenAI re-review, and is batched into a Cursor release.
 
+## 0.1.3
+
+- Skills follow the server's brand-page and playbook additions (registry 1.0.2): `query_brand` `get_page`, `manage_brand` `create_page` / `publish_page` / `revert_page`, the `mosaic://brand-page-guide` resource, and `manage_campaigns` `generate_playbook`. `brand-voice-sync` gains a section on authoring the brand home page (draft with preview URL, publish on approval, revert). `launch-campaign` explains when a campaign has no playbook and how to add one. `/sparkletree:adapt` can target the brand home page. Tool reference updated.
+
 ## 0.1.2
 
 - Registry `server.json` 1.0.2: the live server gained brand pages (`manage_brand` actions `create_page`, `publish_page`, `revert_page`; `query_brand` action `get_page`; resource `mosaic://brand-page-guide`) and `manage_campaigns` action `generate_playbook` after registry 1.0.1 was published on 2026-09-02.
