@@ -10,8 +10,12 @@ done
 
 claude_v=$(jq -r .version .claude-plugin/plugin.json)
 codex_v=$(jq -r .version .codex-plugin/plugin.json)
+gemini_v=$(jq -r .version gemini-extension.json)
 server_v=$(jq -r .version server.json)
+# The three plugin manifests are one version; server.json tracks the hosted
+# server and is allowed to differ (README.md, "Versions").
 [ "$claude_v" = "$codex_v" ] || fail "plugin versions differ: .claude-plugin $claude_v vs .codex-plugin $codex_v"
+[ "$claude_v" = "$gemini_v" ] || fail "plugin versions differ: .claude-plugin $claude_v vs gemini-extension.json $gemini_v"
 echo "$claude_v" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$' || fail "plugin version '$claude_v' is not semver"
 echo "$server_v" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$' || fail "server.json version '$server_v' is not semver"
 

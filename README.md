@@ -95,3 +95,21 @@ scripts/build-openai-bundle.sh
 ```
 
 Layout, tool-name notes and writing rules are in [AGENTS.md](AGENTS.md). Changes are listed in [CHANGELOG.md](CHANGELOG.md).
+
+## Versions
+
+Four files carry a version. They describe two different things, so they do not all match, and that is by design.
+
+| File | What it versions | Bump when |
+| --- | --- | --- |
+| `.claude-plugin/plugin.json` | The plugin package: skills, commands, agents, hooks | Anything in this repo that a user of the plugin can notice |
+| `.codex-plugin/plugin.json` | The same package, for Codex and the OpenAI portal | Always together with the Claude manifest, same number |
+| `gemini-extension.json` | The same package, for Gemini CLI | Always together with the Claude manifest, same number |
+| `server.json` | The hosted MCP server at `https://app.sparkletree.io/api/mcp`, as listed in the official MCP registry | Only when the server's tools, resources, auth or endpoint change |
+
+The rules:
+
+- The three plugin manifests are one version. They ship from the same commit and describe the same files, so they always carry the same number. `scripts/ci-validate.sh` fails the push when they differ or when `CHANGELOG.md` has no section for that version.
+- `server.json` follows the server, not the plugin. The server lives in the SparkleTree monorepo, and its version there (`MCP_SERVER_VERSION`) and the one here must agree; the monorepo's `mcp-version-sync` job fails a merge request while they differ. A skill or docs change here never bumps it.
+- The registry publish on `main` reads `server.json` only. It skips when the registry already lists that version and fails when the version was published before but is no longer the latest. Keeping the two numbers independent means a plugin-only release is a no-op for the registry.
+- When a server change lands, both move: bump `server.json` to match the server, bump the plugin manifests because the skills that describe the tools changed, and name the registry version in the changelog entry (as 0.1.3 does for registry 1.0.2).
