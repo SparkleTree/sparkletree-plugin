@@ -1,6 +1,6 @@
 ---
 name: agency-workspaces
-description: SparkleTree campaign operations across several client workspaces. One connection or API key per workspace, confirm scope before every batch, tool profiles and call codes, role inheritance and revocation. Use when an agency or a headless agent manages more than one SparkleTree workspace or asks about API keys, profiles or call codes.
+description: SparkleTree operations across several client workspaces. One connection or API key per workspace, confirm the workspace before every batch, tool profiles and call codes, roles and revocation. Use when an agency or a headless agent manages more than one SparkleTree workspace, or asks about API keys, profiles, call codes or switching workspace.
 ---
 
 # Agency and multi-workspace operations
@@ -19,17 +19,17 @@ Before the first write in any batch, and again after any switch:
 
 1. `get_platform_info` `topic: "organization"`.
 2. Echo the workspace name to the user in the same message as the plan.
-3. Only then run the recipe (launch, review, digest, video) for that workspace.
+3. Only then run the recipe (launch, review, analytics, video) for that workspace.
 
 Never infer the workspace from memory or from the campaign names you saw earlier.
 
 ## Roles
 
-Connections inherit the signed-in user's role: admin, editor, member or viewer. A reporting connection should belong to a viewer; a publishing connection to a member or editor; brand writes need an admin. Demoting or removing the user cuts every connection they made.
+Connections inherit the signed-in user's role: admin, editor, member or viewer. A reporting connection should belong to a viewer; a publishing connection to a member or editor (surfaces need editor); brand writes and publishing Squid designs need an admin. API keys act as a member, so they cannot write the brand book. Demoting or removing the user cuts every connection they made.
 
 ## Profiles and call codes
 
-The bare URL serves `external_default`. Narrower profiles (analytics_read, campaign_ops, video_ops and others) are selected with `?profile=<call-code>`; the call code is a secret provisioned by the workspace operator, not the profile name. Profile names are rejected and fall back to the minimal discovery profile. Profiles change which tools are visible, never what the user may do. Use a narrow profile for a single-job agent so the tool list stays small and accidents stay impossible. Discover the live list with `get_platform_info` `topic: "tool_profiles"`.
+The bare URL serves `external_default`. Narrower profiles (analytics_read, campaign_ops, video_ops and others) are selected with `?profile=<call-code>`; the call code is a secret provisioned by the workspace operator, not the profile name. Profile names are rejected and fall back to a two-tool discovery profile (`get_platform_info` only, in practice). `?call_code=` works as an alias for `?profile=`. Profiles change which tools are visible, never what the user may do. Use a narrow profile for a single-job agent so the tool list stays small and accidents stay impossible. Discover the live list with `get_platform_info` `topic: "tool_profiles"`.
 
 ## Cross-client reporting
 

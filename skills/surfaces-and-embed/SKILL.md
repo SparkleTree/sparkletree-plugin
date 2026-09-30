@@ -1,6 +1,6 @@
 ---
 name: surfaces-and-embed
-description: SparkleTree campaign surfaces and embedding. Put a published campaign on a website, screen, kiosk or QR code. Covers surfaces and zones, the edge script tag, and the React SDK path (detect the framework, install @sparkletree/react, wire a Hero or Cta island, register the origin). Use for embed, put it on my site, signage, kiosk, screen, QR.
+description: SparkleTree campaign surfaces and embedding. Put a published campaign on a website, in a React or Next.js app, on screens, kiosks and signage, or behind a QR code. Covers the edge script tag, the React SDK (install, provider, Hero or Cta island, origin registration), surfaces, zones and deploy. Use for embed, put it on my site, script tag, SDK, signage, kiosk, screen, QR.
 ---
 
 # Surfaces and embed
@@ -41,9 +41,9 @@ Details, props, Next.js App Router notes and CSP lines: `references/sdk-react.md
 
 ## Create a surface and deploy
 
-Confirm before each write.
+Confirm before each write. Surfaces and zones need the editor role and use the workspace's surface quota.
 
-1. `manage_surfaces` `operation: create_surface` with `name`, `type` (web, retail, indoor_display, transit, stadium, mall, outdoor_billboard, point_of_sale, lobby, vending, speaker, ar, other), and address, city, country when physical.
+1. `manage_surfaces` `operation: create_surface` with `name`, `surfaceType` (web, retail, indoor_display, transit, stadium, mall, outdoor_billboard, point_of_sale, lobby, vending, speaker, ar, other), and address, city, country when physical.
 2. Optional: `manage_surfaces` `operation: create_zone` (`name`, `strategy`: priority-only, round-robin, weighted, zone-coordinated) and assign surfaces to it.
 3. `manage_campaigns` `action: deploy` with `campaignId` and exactly one of `surfaceId` or `zoneId`, plus `priority`.
 4. `manage_campaigns` `action: publish` if not yet published. Publish and deploy trigger republish; there is no separate flush step.

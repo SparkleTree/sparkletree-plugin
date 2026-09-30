@@ -1,54 +1,86 @@
 ---
 name: sparkletree
-description: SparkleTree campaign platform orientation for any task that touches a SparkleTree workspace, including campaigns, variants, Squids, surfaces, brand book, products and analytics. Load before the first tool call. Read mosaic://capabilities, read before you write, confirm before publish, deploy, delete or credit spend, and use the server prompts where the host supports them.
+description: SparkleTree rules for any request that touches a SparkleTree workspace or calls a SparkleTree tool (campaigns, variants, Squids, products, brand, surfaces, video, analytics). Load before the first SparkleTree tool call. Covers which workspace you are in, read before write, confirm before spend or live changes, async polling, error codes, and which SparkleTree skill fits the task.
 ---
 
 # SparkleTree orientation
 
-SparkleTree is a marketing platform. A campaign holds variants (the creatives). The creative unit is the Squid, a conversational ad with a kicker, headline, body, CTA and chips. Campaigns deploy to surfaces (websites, brand page, screens, kiosks, QR codes). Adaptive CVG learns which variant performs and shows it more often. Analytics report Impressions (raw deliveries) and Reach (distinct sessions) separately.
+SparkleTree is a marketing platform. A campaign holds variants (the creatives). The creative unit is the Squid, a conversational ad with a kicker, headline, body, CTA and chips; a Squid can also carry a custom HTML design. Campaigns deploy to surfaces (websites, the brand page, screens, kiosks, QR codes). Adaptive CVG learns which variant performs and shows it more often. Analytics report Impressions (raw deliveries) and Reach (distinct sessions) separately.
 
-The MCP server is `https://app.sparkletree.io/api/mcp`. Every tool runs as the signed-in user, in one workspace, with that user's role. There is no way to reach another workspace from a connection.
+The MCP server is `https://app.sparkletree.io/api/mcp`. Every tool runs as the signed-in user, in one workspace, with that user's role. A connection cannot reach another workspace.
+
+## Pick the skill
+
+| The user wants | Skill |
+|---|---|
+| A new campaign from a product link or a goal | `launch-campaign` |
+| Products, product photos, uploading a file, a CSV import | `products` |
+| The brand book, voice, colours, concierge answers, the brand home page | `brand` |
+| A custom Squid design (their own HTML look), or a video of a design | `squid-design` |
+| Critique or compare variants, check copy is on brand | `review-variants` |
+| Numbers: how campaigns did, which variant wins, a weekly report | `analytics` |
+| What is live or running right now | `status` |
+| A video from a campaign or template, or a commissioned film | `video` |
+| Website embed, React SDK, screens, kiosks, zones, QR | `surfaces-and-embed` |
+| Change live copy from one sentence, once or on a schedule | `adapt` |
+| Several client workspaces, API keys, call codes | `agency-workspaces` |
+| 401, sign-in loops, missing tools, 429 | `troubleshoot-connection` |
 
 ## Before the first tool call
 
-1. Read the resource `mosaic://capabilities` if your host exposes MCP resources. It is the live list of tools, prompts and recommended flows for this workspace and it beats guessing. If the host has no resource support, call `get_platform_info` with `topic: "organization"` and then `topic: "tool_profiles"`.
-2. Say which workspace you are in. `get_platform_info` `topic: "organization"` returns the name. Echo it back before the first write.
-3. Check whether a server prompt covers the task before improvising: `campaign_brief`, `analytics_deep_dive`, `surface_network_planner`, `content_optimizer`, `ai_studio_image_workflow`, `platform_onboarding`. Each returns a step list with exact tool calls. The skills in this plugin teach the same flows for hosts without prompt support.
+1. Read the resource `mosaic://capabilities` if the host exposes MCP resources. It lists the tools and the recommended call order for product images, manual and AI campaigns, the brand page and Squid designs. Without resources, call `get_platform_info` `topic: "organization"`.
+2. Say which workspace you are in. `get_platform_info` `topic: "organization"` returns the name. Echo it before the first write.
+3. Server prompts (`campaign_brief`, `analytics_deep_dive`, `surface_network_planner`, `content_optimizer`, `platform_onboarding`) return step lists with exact calls on hosts that support prompts. The skills in this plugin teach the same flows everywhere else.
 
 ## Read before write
 
 Never change what you have not read in this session. Before any `manage_*` call, fetch the current state with the matching `query_*` tool (`query_campaigns`, `query_products`, `query_surfaces`, `query_brand`, `query_analytics`, `query_video`, `query_video_commissions`). Show the user what exists and what will change.
 
-## Confirm before spend or mutation
+## Confirm before spend or live changes
 
-Tools with `readOnlyHint: true` are free to call. Everything else needs the user's explicit yes, every time, even if a similar run was approved earlier:
+Tools with `readOnlyHint: true` are free. Everything else needs the user's explicit yes, every time, even if a similar run was approved earlier:
 
-- Credit spend: `generate_campaign` (both modes), `render_video` (all modes), `video_commission` create, approve and revise, `manage_products` `import_from_url` (paid inference plus open web).
-- Live marketing changes: `manage_campaigns` publish, deploy, delete, delete_variant, update_deployment; `manage_surfaces`; `manage_brand`; `manage_products` create, update, delete.
+- Credit spend or paid inference: `generate_campaign` (both modes), `render_video` (all modes), `video_commission` create, approve and revise, `manage_products` `import_from_url`, `manage_campaigns` `generate_playbook`.
+- Quota: `manage_products` create and imports, `manage_campaigns` `duplicate`, `manage_surfaces` `create_surface`.
+- Live changes: `manage_campaigns` publish, deploy, delete, delete_variant, update_deployment, `publish_component`, `revert_component`, and `update` to `status: "active"`; `update_variant` on a live campaign (saves republish immediately); `manage_brand` (all actions); `manage_surfaces`; `manage_products` update and delete.
 
-State the exact call, the target by name and id, and who pays (the workspace's monthly credit pool). Then wait. This plugin also ships a hook that asks before the spend tools run; the hook is a backstop, not a substitute for asking.
+State the exact call, the target by name and id, and who pays (the workspace's monthly credit pool). Then wait. This plugin ships a hook that stops before the spend and live-change tools; the hook is a backstop, not a substitute for asking.
+
+`upload_asset` only stores a file in the workspace. It needs no confirmation beyond the user having asked for the file to be used.
 
 ## Async jobs
 
-`generate_campaign`, `render_video`, `video_commission` and CSV import return before the work finishes. Poll at a reasonable interval (10 to 20 seconds): `query_campaigns` `action: generation_status`, `query_video` `action: progress`, `query_video_commissions` `action: get`, `query_products` `action: import_status`. If the host negotiated the tasks extension, `tasks/get` on the attached handle works too. Never re-issue a start call because a poll said "still running"; that starts a second paid job.
+`generate_campaign`, `render_video`, `video_commission` and product imports return before the work finishes. Poll every 10 to 30 seconds: `query_campaigns` `action: generation_status`, `query_video` `action: progress`, `query_video_commissions` `action: get`, `query_products` `action: import_status`. If the host negotiated the tasks extension, `tasks/get` on the returned `taskId` works too. Never re-issue a start call because a poll said "still running"; that starts a second paid job.
 
 ## Pagination and lean responses
 
 List actions use cursor pagination: pass `page.nextCursor` back as `cursor`. Follow the cursor until the question is answered, not until it is exhausted. `query_analytics` defaults `sections` to `["summary"]`; widen only when the task needs it.
 
-## Profiles and call codes
-
-A bare URL gets the `external_default` profile (the 15 tools in `references/tools.md`). Narrower or wider profiles are selected by appending `?profile=<call-code>`, where the call code is a secret the workspace operator hands out; profile names are rejected. Profiles change visibility, not permission. Discover them with `get_platform_info` `topic: "tool_profiles"`.
-
 ## Errors
 
-Every error carries a code, a message and usually a `remedy`. Read the remedy before retrying. `401`: run the OAuth bootstrap again. `429`: back off (limit is 120 requests per minute per token). `precondition_failed` or `entitlement_required`: the workspace plan or quota blocks the action; tell the user, do not retry. If the server says the signed-in user has no workspace, the user creates one at https://app.sparkletree.io/sign-up.
+Every error is `{error: {code, message, remedy, details}}`. Read the remedy before retrying.
+
+| Code | Meaning | Do |
+|---|---|---|
+| `invalid_input` | Wrong action or fields; `details.replacement` names a moved read action | Fix the call |
+| `precondition_failed` | Quota, credits, a daily cap, a state rule, or a question for the user (`details.code: PRODUCT_EXISTS`) | Read `details.code`; ask the user when the remedy says so; never retry blindly |
+| `forbidden` | The role or plan does not allow it | Tell the user who can do it |
+| `entitlement_required` | A plan feature (`details.feature`) | Tell the user; do not retry |
+| `not_configured` | The feature is switched off on this deployment | Say it is not available yet; not a bug |
+| `upstream_error` | A site, store or render service failed | Retry once later; for imports read `details.reason` |
+| `analytics_window_too_large` | Range too long for the granularity | Narrow the range or coarsen the granularity |
+
+HTTP `401`: run the OAuth sign-in again (`troubleshoot-connection`). `429`: back off; the limit is 120 requests per minute per token. A signed-in user without a workspace creates one at https://app.sparkletree.io/sign-up.
+
+## Profiles and call codes
+
+The bare URL serves the `external_default` profile (the 16 tools in `references/tools.md`). Other profiles are selected with `?profile=<call-code>`, where the call code is a secret the workspace operator hands out; profile names are rejected and fall back to a two-tool minimal profile. Profiles change visibility, not permission.
 
 ## Where the inspector appears
 
-On hosts that support MCP Apps (Claude.ai, Claude desktop, ChatGPT), `query_campaigns` and `generate_campaign` results render as an interactive campaign inspector. Claude Code and other terminal hosts get the same data as text; nothing is lost.
+On hosts that support MCP Apps (Claude.ai, Claude desktop, ChatGPT), `query_campaigns` and `generate_campaign` results render as an interactive campaign inspector. Claude Code and other terminal hosts get the same data as text.
 
 ## References
 
-- `references/tools.md`: the 15 default tools, their actions and which ones cost credits.
+- `references/tools.md`: the 16 default tools, their actions, roles and costs.
 - `references/glossary.md`: SparkleTree terms.

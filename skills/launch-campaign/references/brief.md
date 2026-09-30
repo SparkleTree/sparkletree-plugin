@@ -31,7 +31,7 @@ Ask the user for two or three angles, or propose them. State each variant as "an
 
 ## Brand constraints
 
-`query_brand` `action: get` returns voice (tone, personality, dos, donts) and messaging rules. Copy the relevant lines into `options.brandGuidelines`. If the workspace has no brand book yet, say so and offer `skills/brand-voice-sync` before generating; variants inherit brand colors at creation and keep them.
+`query_brand` `action: get` returns voice (tone, personality, dos, donts) and messaging rules. Copy the relevant lines into `options.brandGuidelines`. If the workspace has no brand book yet, say so and offer `skills/brand` before generating; variants inherit brand colors at creation and keep them.
 
 ## Chips
 

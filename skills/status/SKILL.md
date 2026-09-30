@@ -1,7 +1,6 @@
 ---
 name: status
-description: SparkleTree campaign workspace status command, /sparkletree:status. Free reads only. Confirms which workspace the session is bound to, checks server health, lists live and in-review campaigns, running generations and renders, and the products and surfaces count, in under ten lines.
-disable-model-invocation: true
+description: SparkleTree workspace status in under ten lines, reads only. Which workspace this session is bound to, server health, live and in-review campaigns, running generations and renders, products and surfaces. Use for what is live, what is running, is my generation done, SparkleTree status, or at the start of a session.
 ---
 
 Report the state of the connected SparkleTree workspace using reads only. No writes, no credit spend.

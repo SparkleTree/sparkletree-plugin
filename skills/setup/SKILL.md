@@ -1,6 +1,6 @@
 ---
 name: setup
-description: SparkleTree campaign plugin setup, run right after install with /sparkletree:setup. Checks the account prerequisite (a SparkleTree workspace, sign-up link if none), connects and authenticates the MCP server, runs the orientation calls, and walks to a first campaign in about thirty minutes.
+description: First-run setup for the SparkleTree plugin. Account, sign-in, orientation reads and a first campaign.
 disable-model-invocation: true
 ---
 
@@ -29,8 +29,8 @@ Run these and report in four lines:
 
 Offer, in this order, and do only what the user picks:
 
-1. Brand book empty: `skills/brand-voice-sync` from their website. Admin role needed.
-2. No products: import one from a URL (`manage_products` `import_from_url`, paid inference, confirm) or create one by hand.
+1. Brand book empty: `skills/brand` from their website. Admin role needed.
+2. No products: `skills/products` (import from a URL with paid inference, or create by hand with a photo).
 3. First campaign: `skills/launch-campaign`. The brief is shown before anything is generated.
 4. Where it runs: publishing puts it on the brand page; `skills/surfaces-and-embed` for a website, screen or QR.
 
@@ -38,4 +38,4 @@ Offer, in this order, and do only what the user picks:
 
 Tell the user, once: reads are free; publish, deploy, delete and anything that generates or renders asks first (this plugin adds a hook that asks as well); credits come from the workspace's monthly pool; everything runs under their own account and role; removing the connector or the plugin ends access.
 
-Point to `/sparkletree:launch`, `/sparkletree:digest`, `/sparkletree:status`, `/sparkletree:adapt` (a one-sentence live change, once or on a schedule) and, if something fails, `skills/troubleshoot-connection`.
+Point to `/sparkletree:launch`, `/sparkletree:analytics`, `/sparkletree:status`, `/sparkletree:adapt` (a one-sentence live change, once or on a schedule), `/sparkletree:products` (products and photos), `/sparkletree:squid-design` (a custom look for a Squid) and, if something fails, `skills/troubleshoot-connection`.

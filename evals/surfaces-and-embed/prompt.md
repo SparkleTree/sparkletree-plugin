@@ -6,4 +6,4 @@ tags: [skill]
 plugins: ["../.."]
 ---
 
-Put my published SparkleTree campaign on my Next.js site and on the two lobby screens. What are the steps? Do not run anything yet.
+Put my published SparkleTree campaign on my Next.js site and on the two lobby screens. What are the steps? Load any skills you need, but do not call SparkleTree tools in this turn.

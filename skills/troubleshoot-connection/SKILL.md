@@ -1,6 +1,6 @@
 ---
 name: troubleshoot-connection
-description: SparkleTree connection troubleshooting when the SparkleTree MCP server returns 401, sign-in loops, the campaign tools are missing from the session, calls hit 429, or a signed-in user has no workspace. Walks the OAuth bootstrap, re-auth, the new-conversation rule, the 120 requests per minute limit and where to get support.
+description: SparkleTree connection problems. Use when the SparkleTree MCP server answers 401, sign-in loops, the SparkleTree tools are missing from the session, calls hit 429, or a signed-in user has no workspace. Walks the OAuth sign-in, re-authentication, the new-conversation rule, the 120 requests per minute limit and where to get support.
 ---
 
 # Troubleshoot the connection

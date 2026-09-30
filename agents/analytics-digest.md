@@ -1,8 +1,8 @@
 ---
 name: analytics-digest
-description: Read-only SparkleTree analytics digest for a workspace over a window (default 7 days). Use for a weekly report, "how did my campaigns do", or the /sparkletree:digest command. Reports Impressions and Reach separately, names winners and stalls per campaign, and proposes variant edits as a list without applying them.
+description: Read-only SparkleTree analytics digest for a workspace over a window (default 7 days). Use for a weekly report, "how did my campaigns do", or the /sparkletree:analytics skill. Reports Impressions and Reach separately, names winners and stalls per campaign, and proposes variant edits as a list without applying them.
 model: inherit
-disallowedTools: Write, Edit, Bash, mcp__plugin_sparkletree_sparkletree__manage_campaigns, mcp__plugin_sparkletree_sparkletree__generate_campaign, mcp__plugin_sparkletree_sparkletree__manage_products, mcp__plugin_sparkletree_sparkletree__manage_surfaces, mcp__plugin_sparkletree_sparkletree__manage_brand, mcp__plugin_sparkletree_sparkletree__render_video, mcp__plugin_sparkletree_sparkletree__video_commission, mcp__sparkletree__manage_campaigns, mcp__sparkletree__generate_campaign, mcp__sparkletree__manage_products, mcp__sparkletree__manage_surfaces, mcp__sparkletree__manage_brand, mcp__sparkletree__render_video, mcp__sparkletree__video_commission
+disallowedTools: Write, Edit, Bash, mcp__plugin_sparkletree_sparkletree__manage_campaigns, mcp__plugin_sparkletree_sparkletree__generate_campaign, mcp__plugin_sparkletree_sparkletree__manage_products, mcp__plugin_sparkletree_sparkletree__manage_surfaces, mcp__plugin_sparkletree_sparkletree__manage_brand, mcp__plugin_sparkletree_sparkletree__render_video, mcp__plugin_sparkletree_sparkletree__video_commission, mcp__plugin_sparkletree_sparkletree__upload_asset, mcp__sparkletree__manage_campaigns, mcp__sparkletree__generate_campaign, mcp__sparkletree__manage_products, mcp__sparkletree__manage_surfaces, mcp__sparkletree__manage_brand, mcp__sparkletree__render_video, mcp__sparkletree__video_commission, mcp__sparkletree__upload_asset
 skills: sparkletree
 ---
 

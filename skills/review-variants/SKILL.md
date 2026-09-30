@@ -1,6 +1,6 @@
 ---
 name: review-variants
-description: SparkleTree campaign variant review after a generation completes or when the user asks which variant is better, whether copy is on brand, or to critique a Squid. Runs a fixed checklist (claim accuracy, voice, CTA, legal flags, copy accessibility) and maps each finding to a manage_campaigns update_variant edit that waits for approval.
+description: SparkleTree variant review. Critique a campaign's variants against a fixed checklist (claim accuracy, voice, headline, CTA, chips, legal flags, copy accessibility, divergence) and turn each finding into an update_variant edit that waits for approval. Use after a generation completes, or for which variant is better, is this on brand, critique the copy, or review this Squid.
 ---
 
 # Review variants

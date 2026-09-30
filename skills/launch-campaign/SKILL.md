@@ -1,6 +1,6 @@
 ---
 name: launch-campaign
-description: SparkleTree campaign launch from a product URL or a goal. Import the product, write the brief, get approval, generate variants, poll, review, publish and deploy to a surface, then hand back the live link. Use when the user says launch, get this live, campaign for, brief or angle, or pastes a product URL with a marketing goal.
+description: SparkleTree campaign launch from a product URL or a goal. Import or pick the product, write the brief, get approval, generate variants, poll, review, publish and deploy to a surface, then hand back the live link. Use when the user says launch, new campaign, get this live, campaign for, promote, brief or angle, or pastes a product URL with a marketing goal.
 ---
 
 # Launch a campaign
@@ -9,7 +9,7 @@ Goal: a product URL or a plain-language goal becomes a live campaign with a URL 
 
 ## 1. Product
 
-- If the user gave a URL: confirm the credit spend, then `manage_products` `action: import_from_url` with `websiteUrl`. It reaches the open web and runs paid inference. Read the returned product back to the user (name, price, description).
+- If the user gave a URL: `query_products` `action: list` with `search` first, since the product may exist. If not, confirm the credit spend, then `manage_products` `action: import_from_url` with `websiteUrl`. It reaches the open web and runs paid inference. Read the returned product back to the user (name, price, description, image). A `PRODUCT_EXISTS` answer means ask the user: use the match, or import again with `allowDuplicate: true`. Photos and other product work: `skills/products`.
 - Otherwise `query_products` `action: list` and pick the product(s) the goal names. No product means no generation; ask the user which product or offer the import.
 
 ## 2. Brief
@@ -33,7 +33,7 @@ If generation fails, read the error remedy. `mode: regenerate` from the failing 
 
 `query_campaigns` `action: variants` on the new campaign. Hand the variants to the `sparkletree:campaign-reviewer` agent when available, or run `skills/review-variants` yourself. Present the findings as a diff-style list. Apply approved edits with `manage_campaigns` `action: update_variant`. Saves republish automatically.
 
-A generated campaign already carries its conversational playbook (the chat opening, product facts, FAQs and question chips the Squid answers with). A campaign made by hand with `manage_campaigns` `action: create` has none; publishing adds one automatically, and `manage_campaigns` `action: generate_playbook` with the `campaignId` writes or rewrites it on demand after product or variant edits. Free, no credits.
+A generated campaign already carries its conversational playbook (the chat opening, product facts, FAQs and question chips the Squid answers with). A campaign made by hand with `manage_campaigns` `action: create` has none; publishing adds one automatically, and `manage_campaigns` `action: generate_playbook` with the `campaignId` writes or rewrites it on demand after product or variant edits. It runs paid inference; confirm first.
 
 ## 5. Publish and deploy
 
@@ -41,6 +41,7 @@ Ask which surface. `query_surfaces` `operation: list_surfaces` (and `list_zones`
 
 1. `manage_campaigns` `action: publish` with `visibility: "public"` if the page should be reachable at its URL.
 2. `manage_campaigns` `action: deploy` with `surfaceId` or `zoneId` (exactly one).
+3. If the campaign is still in review, `manage_campaigns` `action: update` with `status: "active"`. If the answer carries `approval: {status: "required"}`, the workspace wants a second approver: tell the user who must approve, and stop.
 
 If the user has no surface yet, the brand page already carries every published campaign; publishing alone is enough for a first launch. Offer `skills/surfaces-and-embed` for the website, screen and QR routes.
 
@@ -50,4 +51,4 @@ Return: campaign name and id, variant count, the surface, and the live URL. The 
 
 ## Stop conditions
 
-Stop and ask instead of guessing when: no product resolves; the objective is ambiguous between two of the four; the workspace returns `precondition_failed` for quota or credits; the user has not approved the brief.
+Stop and ask instead of guessing when: no product resolves; the objective is ambiguous between two of the four; the workspace returns `precondition_failed` for quota or credits (read `details.code`); the user has not approved the brief.

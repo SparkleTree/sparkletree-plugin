@@ -4,6 +4,8 @@
 - Campaign: the unit you generate, publish and measure. Has a goal, products, variants and deployments. Status: generating, review, active, paused, ended, failed.
 - Variant: one creative inside a campaign. Adaptive CVG picks among active variants.
 - Squid: the conversational ad a campaign renders. Parts: kicker, headline, body, CTA pill, up to six chips, chat.
+- Design: a custom HTML look for a Squid, authored by an agent or a person, with a manifest of slots (headline, CTA, custom text, lists, images). Publishing a design adds a new variant, so Adaptive CVG tests it against the others.
+- Slots: the named fields a design fills; custom slot values live in the variant's `contentStructure.squidSlots`.
 - Chips: suggested questions under the chat. Spend them on questions customers actually ask.
 - Adaptive CVG: the selection engine that shows the winning variant more often once it has evidence. Needs traffic before it can learn.
 - Surface: a place a campaign appears. Types include web, retail, transit, stadium, indoor_display, point_of_sale, lobby, ar.
@@ -11,6 +13,8 @@
 - Deployment: a campaign placed on a surface or zone, with priority and status (scheduled, active, paused, ended).
 - Publish: make the campaign's page live on the edge and the brand page. `visibility: public` is what lets the edge serve the public campaign page.
 - Brand page: the public home at `<name>.sparkletree.io` or a custom domain. Published campaigns appear there automatically. Serves `/llms.txt`, `/ask` and other public agent surfaces without auth.
+- Asset: a file stored in the workspace by `upload_asset` (images and video). Its `assetId` goes into fields such as `manage_products` `imageAssetId`.
+- Gallery: up to five images per product; the first is the primary image.
 - Brand book: visual identity (logo, colors, fonts, imagery) and voice guidelines (tone, personality, dos, donts, messaging rules).
 - Concierge: the brand's `/ask` assistant, configured through `manage_brand` `update_concierge` (chips, facts, FAQ, policies).
 - Impressions: raw delivery count, one per load. Reloads inflate it.

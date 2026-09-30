@@ -1,13 +1,13 @@
 ---
-name: brand-voice-sync
-description: SparkleTree brand book and voice setup. Build or refresh the brand profile, visual identity, voice guidelines and concierge answers from a website or documents, then write them with manage_brand so campaigns and the brand page stay consistent. Use for import our brand, tone, brand book, voice, or onboarding a new SparkleTree workspace.
+name: brand
+description: SparkleTree brand book, voice and brand page. Set up or refresh logo, colours, fonts, tone, dos and donts, messaging and the concierge answers from a website or documents, and author or revert the brand home page. Use for import our brand, tone of voice, brand colours, brand guidelines, concierge, brand page, or onboarding a new SparkleTree workspace.
 ---
 
-# Brand voice sync
+# Brand book, voice and brand page
 
 The brand book is what every generated variant, Squid and page inherits. Get it right once and generation stays on voice; leave it empty and every campaign starts from nothing.
 
-Brand writes need the admin role. Check with `get_platform_info` `topic: "organization"`; if the user is not an admin, prepare the content and hand it over instead of calling `manage_brand`.
+Brand writes need the admin role (a workspace API key counts as a member and cannot make them). The one exception is a brand home page draft, which a member can store. Check with `get_platform_info` `topic: "organization"`; if the user is not an admin, prepare the content and hand it over instead of calling `manage_brand`.
 
 ## 1. Read what exists
 
@@ -29,6 +29,9 @@ Produce, and show, before writing:
 - profile: website, socials, location
 - concierge: six chips that are real customer questions, the facts the `/ask` assistant may state (hours, address, delivery, returns), policies, FAQ
 - colors: primary, secondary, accent, background, text as CSS values. Renderers read these five slots.
+- fonts: heading and body font families, if the site shows them. The website import does not bring fonts over this connection; set them in `brandAssets.fonts` or `voice.headingFont` and `voice.bodyFont`.
+
+Logo and imagery are stored as links. Use a link the brand controls, or put the file in the workspace first with `upload_asset` and use the returned `asset.url`.
 
 Keep everything factual. The concierge answers visitors on the public brand page; anything written here is said to customers.
 
@@ -38,8 +41,8 @@ After the user approves, write only the subtrees you changed. Writes merge per s
 
 - `manage_brand` `action: update_brandbook` with `brandAssets` (logo, colors, fonts, imagery) and `brandGuidelines` (voice, messaging, contentRules)
 - `manage_brand` `action: update_profile` with `profile`
-- `manage_brand` `action: update_voice` with `voice` (eyebrow, tagline)
-- `manage_brand` `action: update_concierge` with `concierge`
+- `manage_brand` `action: update_voice` with `voice` (eyebrow, tagline, headingFont, bodyFont, tone)
+- `manage_brand` `action: update_concierge` with `concierge` (chips, inputHint, language, assistant, hideCampaigns)
 
 Edge caches invalidate in the same call. Published campaign pages bake visuals at publish time; if colours or the logo changed, republish the affected campaigns with `manage_campaigns` `action: publish` (confirm first). Existing variants keep the colour scheme they inherited.
 

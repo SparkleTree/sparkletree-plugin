@@ -2,10 +2,11 @@
   "hooks": {
     "SessionStart": [
       {
+        "matcher": "startup|clear|compact",
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/check-connector.sh",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/scripts/check-connector.sh\"",
             "timeout": 3
           }
         ]
@@ -13,11 +14,23 @@
     ],
     "PreToolUse": [
       {
-        "matcher": "mcp__.*__(generate_campaign|render_video|video_commission|manage_campaigns)$",
+        "matcher": "mcp__.*__(generate_campaign|render_video|video_commission|manage_campaigns|manage_products|manage_brand|manage_surfaces|upload_asset)$",
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/spend-guard.sh",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/scripts/spend-guard.sh\" \"${CLAUDE_PLUGIN_DATA}\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "mcp__.*__(generate_campaign|render_video|video_commission)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/scripts/job-watch.sh\" \"${CLAUDE_PLUGIN_DATA}\"",
             "timeout": 5
           }
         ]
