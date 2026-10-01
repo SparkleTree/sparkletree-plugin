@@ -54,7 +54,7 @@ esac
 level=none; msg=""
 case "$suffix" in
   generate_campaign)
-    level=spend; msg="generate_campaign (mode=${mode:-start}) runs paid AI generation from the workspace's monthly credit pool. Confirm the brief and the spend first." ;;
+    level=spend; msg="generate_campaign (mode=${mode:-start}) runs paid AI generation from the workspace's monthly credit pool. Confirm the goal and the spend first." ;;
   render_video)
     level=spend
     case "$mode" in
@@ -64,7 +64,7 @@ case "$suffix" in
     esac ;;
   video_commission)
     case "$action" in
-      create) level=spend; msg="video_commission action=create queues a metered film commission (credits, five per workspace per day). Confirm the brief, aspect, duration and tier." ;;
+      create) level=spend; msg="video_commission action=create queues a metered film commission (credits, five per workspace per day). Confirm the description, aspect, duration and tier." ;;
       approve) level=spend; msg="video_commission action=approve queues the final render and spends credits again." ;;
       revise) level=spend; msg="video_commission action=revise spends a metered revision round. Confirm the notes and that rounds remain." ;;
       cancel) level=live; msg="video_commission action=cancel stops a commission; spent rounds are not refunded." ;;
@@ -92,6 +92,7 @@ case "$suffix" in
       publish_page) level=live; msg="manage_brand action=publish_page replaces the live brand home page." ;;
       revert_page) level=live; msg="manage_brand action=revert_page puts the default brand home page back live." ;;
       update_*) level=live; msg="manage_brand action=$action changes the brand every campaign, the brand page and the concierge use. Confirm the old and new values." ;;
+      set_logo) level=live; msg="manage_brand action=set_logo replaces a logo that campaigns, the brand page and the concierge use. Confirm the slot and the image." ;;
     esac ;;
   manage_surfaces)
     level=live; msg="manage_surfaces operation=${operation:-?} creates a surface or zone (editor role, surface quota)." ;;

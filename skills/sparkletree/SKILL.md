@@ -30,11 +30,11 @@ The MCP server is `https://app.sparkletree.io/api/mcp`. Every tool runs as the s
 
 1. Read the resource `mosaic://capabilities` if the host exposes MCP resources. It lists the tools and the recommended call order for product images, manual and AI campaigns, the brand page and Squid designs. Without resources, call `get_platform_info` `topic: "organization"`.
 2. Say which workspace you are in. `get_platform_info` `topic: "organization"` returns the name. Echo it before the first write.
-3. Server prompts (`campaign_brief`, `analytics_deep_dive`, `surface_network_planner`, `content_optimizer`, `platform_onboarding`) return step lists with exact calls on hosts that support prompts. The skills in this plugin teach the same flows everywhere else.
+3. Server prompts (`campaign_brief`, titled Create Campaign Plan; `analytics_deep_dive`, `surface_network_planner`, `content_optimizer`, `platform_onboarding`) return step lists with exact calls on hosts that support prompts. The skills in this plugin teach the same flows everywhere else.
 
 ## Read before write
 
-Never change what you have not read in this session. Before any `manage_*` call, fetch the current state with the matching `query_*` tool (`query_campaigns`, `query_products`, `query_surfaces`, `query_brand`, `query_analytics`, `query_video`, `query_video_commissions`). Show the user what exists and what will change.
+Never change what you have not read in this session. Before any `manage_*` call, fetch the current state with the matching `query_*` tool (`query_campaigns`, `query_products`, `query_surfaces`, `query_brand`, `query_analytics`, `query_video`, `query_video_commissions`, `query_assets`). Show the user what exists and what will change.
 
 ## Confirm before spend or live changes
 
@@ -46,7 +46,7 @@ Tools with `readOnlyHint: true` are free. Everything else needs the user's expli
 
 State the exact call, the target by name and id, and who pays (the workspace's monthly credit pool). Then wait. This plugin ships a hook that stops before the spend and live-change tools; the hook is a backstop, not a substitute for asking.
 
-`upload_asset` only stores a file in the workspace. It needs no confirmation beyond the user having asked for the file to be used.
+`upload_asset` only stores a file in the workspace (`from_url`, `from_data`, or `create_upload` then `complete_upload` for a local or large file). It needs no confirmation beyond the user having asked for the file to be used. `query_assets` lists what is already stored, so check it before uploading the same file again.
 
 ## Async jobs
 
@@ -74,7 +74,7 @@ HTTP `401`: run the OAuth sign-in again (`troubleshoot-connection`). `429`: back
 
 ## Profiles and call codes
 
-The bare URL serves the `external_default` profile (the 16 tools in `references/tools.md`). Other profiles are selected with `?profile=<call-code>`, where the call code is a secret the workspace operator hands out; profile names are rejected and fall back to a two-tool minimal profile. Profiles change visibility, not permission.
+The bare URL serves the `external_default` profile (the 17 tools in `references/tools.md`). Other profiles are selected with `?profile=<call-code>`, where the call code is a secret the workspace operator hands out; profile names are rejected and fall back to a two-tool minimal profile. Profiles change visibility, not permission.
 
 ## Where the inspector appears
 
@@ -82,5 +82,5 @@ On hosts that support MCP Apps (Claude.ai, Claude desktop, ChatGPT), `query_camp
 
 ## References
 
-- `references/tools.md`: the 16 default tools, their actions, roles and costs.
+- `references/tools.md`: the 17 default tools, their actions, roles and costs.
 - `references/glossary.md`: SparkleTree terms.

@@ -29,6 +29,8 @@ run() {
   check "brand draft passes" pass "$(pl default ${P}manage_brand '{"action":"create_page","html":"<html></html>"}')"
   check "brand publish=true asks" ask "$(pl default ${P}manage_brand '{"action":"create_page","html":"x","publish":true}')"
   check "brand voice asks" ask "$(pl default ${P}manage_brand '{"action":"update_voice","voice":{}}')"
+  check "set_logo asks" ask "$(pl default ${P}manage_brand '{"action":"set_logo","logoAssetId":"k"}')"
+  check "complete_upload passes" pass "$(pl default ${P}upload_asset '{"action":"complete_upload","uploadId":"u"}')"
   check "surface asks" ask "$(pl default ${P}manage_surfaces '{"operation":"create_surface","name":"Lobby"}')"
   check "upload passes" pass "$(pl default ${P}upload_asset '{"action":"from_url","url":"https://x/y.png"}')"
   check "reviewer agent denied" deny "$(pl default ${C}manage_campaigns '{"action":"update_variant"}' ',"agent_id":"a1","agent_type":"sparkletree:campaign-reviewer"')"

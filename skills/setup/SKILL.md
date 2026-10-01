@@ -31,7 +31,7 @@ Offer, in this order, and do only what the user picks:
 
 1. Brand book empty: `skills/brand` from their website. Admin role needed.
 2. No products: `skills/products` (import from a URL with paid inference, or create by hand with a photo).
-3. First campaign: `skills/launch-campaign`. The brief is shown before anything is generated.
+3. First campaign: `skills/launch-campaign`. The campaign plan is shown before anything is generated.
 4. Where it runs: publishing puts it on the brand page; `skills/surfaces-and-embed` for a website, screen or QR.
 
 ## 5. What to remember

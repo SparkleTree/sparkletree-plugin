@@ -7,7 +7,7 @@ description: SparkleTree brand book, voice and brand page. Set up or refresh log
 
 The brand book is what every generated variant, Squid and page inherits. Get it right once and generation stays on voice; leave it empty and every campaign starts from nothing.
 
-Brand writes need the admin role (a workspace API key counts as a member and cannot make them). The one exception is a brand home page draft, which a member can store. Check with `get_platform_info` `topic: "organization"`; if the user is not an admin, prepare the content and hand it over instead of calling `manage_brand`.
+Brand writes need the admin role (a workspace API key counts as a member and cannot make them). The one exception is a brand home page draft, which a member can store. The plan matters too: a workspace without an active plan cannot change brand data, a Starter workspace that holds a verified address cannot either, and brand home page actions need a plan that includes publishing a brand page. The `forbidden` answer says which. Check with `get_platform_info` `topic: "organization"`; if the user is not an admin, prepare the content and hand it over instead of calling `manage_brand`.
 
 ## 1. Read what exists
 
@@ -31,7 +31,7 @@ Produce, and show, before writing:
 - colors: primary, secondary, accent, background, text as CSS values. Renderers read these five slots.
 - fonts: heading and body font families, if the site shows them. The website import does not bring fonts over this connection; set them in `brandAssets.fonts` or `voice.headingFont` and `voice.bodyFont`.
 
-Logo and imagery are stored as links. Use a link the brand controls, or put the file in the workspace first with `upload_asset` and use the returned `asset.url`.
+Logo: use `manage_brand` `action: set_logo` (step 4), not a link inside `brandAssets`. Imagery is stored as links; use a link the brand controls, or put the file in the workspace first with `upload_asset` and use the returned `asset.url`.
 
 Keep everything factual. The concierge answers visitors on the public brand page; anything written here is said to customers.
 
@@ -43,6 +43,7 @@ After the user approves, write only the subtrees you changed. Writes merge per s
 - `manage_brand` `action: update_profile` with `profile`
 - `manage_brand` `action: update_voice` with `voice` (eyebrow, tagline, headingFont, bodyFont, tone)
 - `manage_brand` `action: update_concierge` with `concierge` (chips, inputHint, language, assistant, hideCampaigns)
+- `manage_brand` `action: set_logo` with `logoSlot` (primary by default; light, dark or icon) and exactly one of `logoAssetId` (from `upload_asset` or `query_assets`) or `logoUrl`. A link is downloaded and stored in the workspace. PNG, JPEG, WebP, GIF or AVIF; SVG is refused, so export it as PNG first. Other slots are kept.
 
 Edge caches invalidate in the same call. Published campaign pages bake visuals at publish time; if colours or the logo changed, republish the affected campaigns with `manage_campaigns` `action: publish` (confirm first). Existing variants keep the colour scheme they inherited.
 

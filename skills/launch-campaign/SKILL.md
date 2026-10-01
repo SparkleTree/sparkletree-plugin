@@ -1,6 +1,6 @@
 ---
 name: launch-campaign
-description: SparkleTree campaign launch from a product URL or a goal. Import or pick the product, write the brief, get approval, generate variants, poll, review, publish and deploy to a surface, then hand back the live link. Use when the user says launch, new campaign, get this live, campaign for, promote, brief or angle, or pastes a product URL with a marketing goal.
+description: SparkleTree campaign launch from a product URL or a goal. Import or pick the product, write the campaign plan, get approval, generate variants, poll, review, publish and deploy to a surface, then hand back the live link. Use when the user says launch, new campaign, get this live, campaign for, promote, angle, or pastes a product URL with a marketing goal.
 ---
 
 # Launch a campaign
@@ -12,9 +12,9 @@ Goal: a product URL or a plain-language goal becomes a live campaign with a URL 
 - If the user gave a URL: `query_products` `action: list` with `search` first, since the product may exist. If not, confirm the credit spend, then `manage_products` `action: import_from_url` with `websiteUrl`. It reaches the open web and runs paid inference. Read the returned product back to the user (name, price, description, image). A `PRODUCT_EXISTS` answer means ask the user: use the match, or import again with `allowDuplicate: true`. Photos and other product work: `skills/products`.
 - Otherwise `query_products` `action: list` and pick the product(s) the goal names. No product means no generation; ask the user which product or offer the import.
 
-## 2. Brief
+## 2. Plan
 
-Write the brief before touching `generate_campaign`. Show it and wait for a yes. Use the `campaign_brief` server prompt when the host supports prompts; otherwise follow `references/brief.md`. The brief has exactly these parts:
+Write the campaign plan before touching `generate_campaign`. Show it and wait for a yes. Use the `campaign_brief` server prompt (titled Create Campaign Plan) when the host supports prompts; otherwise follow `references/plan.md`. The plan has exactly these parts:
 
 1. Objective: one of increase_sales, drive_traffic, build_awareness, promote_event. Say which and why.
 2. Outcome: one measurable sentence ("40 brunch bookings from the QR menu in September").
@@ -25,7 +25,7 @@ Write the brief before touching `generate_campaign`. Show it and wait for a yes.
 
 ## 3. Generate
 
-On approval, `generate_campaign` `mode: start` with the intent shaped as in `skills/sparkletree/references/tools.md`. Pass `options.variantCount` and `options.brandGuidelines` from the brief. Then poll `query_campaigns` `action: generation_status` every 10 to 20 seconds until it completes or fails. Do not restart on "still running".
+On approval, `generate_campaign` `mode: start` with the intent shaped as in `skills/sparkletree/references/tools.md`. Pass `options.variantCount` and `options.brandGuidelines` from the plan. Then poll `query_campaigns` `action: generation_status` every 10 to 20 seconds until it completes or fails. Do not restart on "still running".
 
 If generation fails, read the error remedy. `mode: regenerate` from the failing `fromStep` is the fix for a partial run; it costs credits again, so confirm.
 
@@ -51,4 +51,4 @@ Return: campaign name and id, variant count, the surface, and the live URL. The 
 
 ## Stop conditions
 
-Stop and ask instead of guessing when: no product resolves; the objective is ambiguous between two of the four; the workspace returns `precondition_failed` for quota or credits (read `details.code`); the user has not approved the brief.
+Stop and ask instead of guessing when: no product resolves; the objective is ambiguous between two of the four; the workspace returns `precondition_failed` for quota or credits (read `details.code`); the user has not approved the plan.

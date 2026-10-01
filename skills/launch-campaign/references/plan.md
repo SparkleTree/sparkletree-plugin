@@ -1,6 +1,6 @@
-# Writing the brief
+# Writing the campaign plan
 
-The brief is the only step where judgement matters more than tool knowledge. Generation turns intent into variants; a vague intent gives variants that differ only in adjectives.
+The plan is the only step where judgement matters more than tool knowledge. Generation turns intent into variants; a vague intent gives variants that differ only in adjectives.
 
 ## From goal to objective
 
@@ -39,6 +39,6 @@ Chips are shared across the campaign, up to six. Spend them on questions custome
 
 ## The confirmation line
 
-End the brief with the cost line and a question, for example:
+End the plan with the cost line and a question, for example:
 
 "This runs one generation (credits from the workspace pool) and creates the campaign in review, unpublished. Go ahead?"

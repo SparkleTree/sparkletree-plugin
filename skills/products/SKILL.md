@@ -1,6 +1,6 @@
 ---
 name: products
-description: SparkleTree products and product images. Add, import, edit or delete products; upload a photo or video file into the workspace with upload_asset; manage a product's image gallery; import a CSV catalogue; handle the "product already exists" answer. Use for add a product, import from my shop, upload this image, product photos, change a price, or when a campaign needs a product that does not exist yet.
+description: SparkleTree products and product images. Add, import, edit or delete products; upload a photo or video file into the workspace with upload_asset, or find one already stored with query_assets; manage a product's image gallery; import a CSV catalogue; handle the "product already exists" answer. Use for add a product, import from my shop, upload this image, product photos, change a price, or when a campaign needs a product that does not exist yet.
 ---
 
 # Products and images
@@ -31,7 +31,9 @@ A product holds up to five images; the first is the primary image that campaigns
 
 1. Get the file into the workspace:
    - A public link to the image itself: pass it as `imageUrl`. The server downloads and stores a copy; if it cannot, the call fails rather than saving a link that may break later.
-   - A local file, a screenshot, or anything without a public link: `upload_asset` `action: from_data` with the file as base64 or a data URI (1 MB max) and a `filename`. Larger local files need a public link and `action: from_url`.
+   - A small local file or a screenshot (1 MB at most): `upload_asset` `action: from_data` with the file as base64 or a data URI and a `filename`.
+   - A larger local file: `upload_asset` `action: create_upload` with `filename` and `bytes` (the exact size). Run the returned curl line (it PUTs the file to `uploadUrl` as form field `file`) if you have a shell; otherwise give the user the line. Then `upload_asset` `action: complete_upload` with the `uploadId`.
+   - A file that may already be in the workspace: `query_assets` `action: list` (newest first, `kind: image`) and use its `assetId`. Sending the same file again also returns the stored one (`reused: true`).
    - `upload_asset` answers with `asset.assetId`; pass it as `imageAssetId`.
 2. Attach it:
    - New product: `create` with `imageUrl` or `imageAssetId`.
@@ -39,7 +41,7 @@ A product holds up to five images; the first is the primary image that campaigns
    - Add to the gallery: `add_image` with one of the two, optional `makePrimary: true`.
 3. Arrange: `query_products` `action: get` for the image ids, then `set_primary_image` or `remove_image` with `imageId`, or `reorder_images` with every id exactly once.
 
-Accepted: JPEG, PNG, WebP, GIF, AVIF (16 MB); MP4, MOV, WebM for video (64 MB), but a product image must be an image. HEIC, SVG, PDF and web pages are refused; the error says how to convert. An older product that only has an image link shows an empty gallery; `add_image` starts the gallery from that link first.
+Accepted: JPEG, PNG, WebP, GIF, AVIF (16 MB); MP4, MOV, WebM for video (64 MB by link, 128 MB through `create_upload`), but a product image must be an image. `import_from_url` copies the page's image into the workspace itself. HEIC, SVG, PDF and web pages are refused; the error says how to convert. An older product that only has an image link shows an empty gallery; `add_image` starts the gallery from that link first.
 
 A sixth image returns `precondition_failed` with `PRODUCT_IMAGE_LIMIT`: ask which image to remove.
 
