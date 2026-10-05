@@ -1,6 +1,8 @@
 # SparkleTree plugin
 
-SparkleTree makes marketing campaigns that adapt to where they run and answer customers in your brand's voice. This plugin connects your AI to your SparkleTree workspace and teaches it the campaign craft: it reads your products and brand book, writes a brief, generates variants, publishes to your web pages and screens, and reads back what performed. Everything runs under your own account and role.
+SparkleTree is a one-stop shop for building, managing and promoting your business online: brand, web presence, SEO and AI visibility, and campaigns, from one connected system. It distributes those campaigns to websites and socials, digital signage and DOOH screens, kiosks, print and QR codes, and live streams, including NDI, with delivery across screen networks.
+
+This plugin connects your AI to your SparkleTree workspace and teaches it the campaign craft: it reads your products and brand book, drafts the campaign plan with you, generates variants, publishes to your web pages and screens, and reads back what performed. Everything runs under your own account and role.
 
 You need a SparkleTree workspace. Create one at https://app.sparkletree.io/sign-up; the connection cannot create it for you.
 

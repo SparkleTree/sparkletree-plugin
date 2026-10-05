@@ -1,7 +1,7 @@
 {
   "name": "sparkletree",
   "version": "0.1.3",
-  "description": "Create, publish and measure SparkleTree marketing campaigns from Gemini CLI. Remote MCP server with OAuth 2.1; skills for the campaign craft.",
+  "description": "Build your brand and web presence, and create, publish and measure SparkleTree campaigns online and on screens, from Gemini CLI. Remote MCP server with OAuth 2.1; skills for the campaign craft.",
   "contextFileName": "AGENTS.md",
   "mcpServers": {
     "sparkletree": {

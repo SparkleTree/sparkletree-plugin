@@ -1,11 +1,11 @@
 ---
 name: sparkletree
-description: SparkleTree campaign platform orientation for any task that touches a SparkleTree workspace, including campaigns, variants, Squids, surfaces, brand book, products and analytics. Load before the first tool call. Read mosaic://capabilities, read before you write, confirm before publish, deploy, delete or credit spend, and use the server prompts where the host supports them.
+description: SparkleTree workspace orientation for any task that touches a SparkleTree workspace, including campaigns, variants, Squids, surfaces, brand book, products and analytics. Load before the first tool call. Read mosaic://capabilities, read before you write, confirm before publish, deploy, delete or credit spend, and use the server prompts where the host supports them.
 ---
 
 # SparkleTree orientation
 
-SparkleTree is a marketing platform. A campaign holds variants (the creatives). The creative unit is the Squid, a conversational ad with a kicker, headline, body, CTA and chips. Campaigns deploy to surfaces (websites, brand page, screens, kiosks, QR codes). Adaptive CVG learns which variant performs and shows it more often. Analytics report Impressions (raw deliveries) and Reach (distinct sessions) separately.
+SparkleTree is a one-stop shop for building, managing and promoting a business online: brand, web presence, search and AI visibility, and campaigns, from one connected system. It distributes those campaigns to websites and socials, digital signage and DOOH screens, kiosks, print and QR codes, and live streams (including NDI), with delivery across screen networks. A campaign holds variants (the creatives). The creative unit is the Squid, a conversational ad with a kicker, headline, body, CTA and chips. Campaigns deploy to surfaces (websites, brand page, screens, kiosks, QR codes). Adaptive CVG learns which variant performs and shows it more often. Analytics report Impressions (raw deliveries) and Reach (distinct sessions) separately.
 
 The MCP server is `https://app.sparkletree.io/api/mcp`. Every tool runs as the signed-in user, in one workspace, with that user's role. There is no way to reach another workspace from a connection.
 
