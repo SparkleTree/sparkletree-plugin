@@ -1,6 +1,6 @@
 ---
 name: surfaces-and-embed
-description: SparkleTree campaign surfaces and embedding. Put a published campaign on a website, in a React or Next.js app, on screens, kiosks and signage, or behind a QR code. Covers the edge script tag, the React SDK (install, provider, Hero or Cta island, origin registration), surfaces, zones and deploy. Use for embed, put it on my site, script tag, SDK, signage, kiosk, screen, QR.
+description: SparkleTree campaign surfaces and embedding. Put a published campaign on a website, in a React or Next.js app, on screens, kiosks and signage, or behind a QR code. Covers the edge script tag, the React SDK (install, provider, Hero or Cta island, origin registration, track for Site activity), surfaces, zones and deploy. Use for embed, put it on my site, script tag, SDK, track clicks, signage, kiosk, screen, QR.
 ---
 
 # Surfaces and embed
@@ -38,6 +38,10 @@ The Squid renders in place, served from the edge, showing the variant Adaptive C
 6. Verify degrade first: point at an unreachable `apiBase`, load the page, confirm the fallback renders and `phase` is `failed`. Then verify the happy path.
 
 Details, props, Next.js App Router notes and CSP lines: `references/sdk-react.md`.
+
+## Site activity: record what visitors do
+
+Impressions and clicks on campaign creative are recorded by the script tag and the SDK components, and brand page views by the edge. The site's own buttons, links and searches reach Dashboard > Analytics > Site activity only when the site sends them with the SDK's `track`: a `campaignId` of the workspace, `"click"` or `"custom"`, and every detail inside `context` with `context.kind` as the event's name. Ask the user which actions they want to see and wire them while building. Snippets, naming rules and how to check: `references/site-activity.md`.
 
 ## Create a surface and deploy
 

@@ -95,6 +95,8 @@ Headline `impressions`, `clicks` and `conversions` in `summary` and `timeseries`
 
 `creatives` treats the creative (variant or Squid design) as the unit: `creatives.channels` is the overview by channel (signage, web, brand_pages, socials with platforms under it, qr_scans), each with its own rates and where the figure comes from ("Measured by SparkleTree" or "Reported by Meta"); `creatives.creatives.rows` lists each creative with per-channel figures, and `unattributed` holds figures not linked to a creative, one row per channel. `productIds`, `eventTypes` and segment filters make the section unavailable.
 
+Site activity (brand page views by page path, and the events a brand page or an SDK site sends with `track`) is shown in the dashboard only; no `query_analytics` section returns it yet. How a site sends those events: the `surfaces-and-embed` skill, `references/site-activity.md`.
+
 `spend` shows Meta spend in the ad account's currency (`currency.meta`) and never adds across currencies: `spendCents.meta`, `total`, `roas` and `cpa` are null when they would, and `spendByCurrency` always has the per-currency figures.
 
 ## upload_asset

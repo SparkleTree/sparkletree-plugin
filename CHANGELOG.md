@@ -2,6 +2,11 @@
 
 Any change to a tool schema on the server bumps the plugin version, gets a note here for the OpenAI re-review, and is batched into a Cursor release.
 
+## 0.2.2
+
+- Site activity. Skills now say how a site the agent builds gets into Dashboard > Analytics > Site activity. New `surfaces-and-embed/references/site-activity.md`: what is recorded without code (brand page views per path; impressions and clicks on campaign creative), and how to send the site's own actions with the SDK's `track` (`SparkleTree.track` from `/api/embed/v1/sdk/core.js` on a brand page, `track` from `@sparkletree/core` elsewhere): a campaign id of the workspace, `"click"` or `"custom"`, every detail inside `context`, `context.kind` as the event's name, the naming rules for breakdowns, a `results` number for searches that found nothing, and no personal data.
+- `brand` asks which visitor actions the user wants to see and records them on the page as the agent guide's "Measure what visitors do" section shows (monorepo: same release as this note). `surfaces-and-embed`, its React reference, `analytics` and the tool reference point at Site activity and say that `query_analytics` does not return it yet. No tool or server change; `server.json` stays at 1.0.3.
+
 ## 0.2.1
 
 - Follows the final registry 1.0.3 server surface; `server.json` stays at 1.0.3. `check_component` and `match_templates` are now `manage_campaigns` actions, so `query_campaigns` carries only pure reads (`list_templates`, `get_template`, `get_component`, `forecast` and the rest). Their inputs, outputs, roles and limits are unchanged, and both still change no campaign data. Sending either to `query_campaigns` returns `invalid_input` naming `manage_campaigns`.
