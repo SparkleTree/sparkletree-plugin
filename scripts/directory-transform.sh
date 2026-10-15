@@ -1,14 +1,18 @@
 #!/bin/sh
 # Turns a checkout of main into the `directory` branch that Anthropic's
 # directory lists. The directory branch is main with two differences:
-#   - `.mcp.json` points at https://app.sparkletree.io/api/mcp/directory, the
-#     connector submitted to the directory (`directory_default` in the monorepo's
-#     lib/mcp/toolGates.ts): 15 tools, no AI images, no AI video commissions.
+#   - Every connection manifest (`.mcp.json`, which the Claude and Codex
+#     manifests both use, and `gemini-extension.json`) points at
+#     https://app.sparkletree.io/api/mcp/directory, the connector submitted to
+#     the directory (`directory_default` in the monorepo's lib/mcp/toolGates.ts):
+#     15 tools, no AI images, no AI video commissions.
 #   - Skills, agents, hooks, README, SETUP, AGENTS and evals describe only those
 #     15 tools.
 # Every edit names the exact text it replaces and fails when main no longer has
 # it, so a wording change on main stops CI here instead of shipping half-edited
-# text. A final check fails on any leftover mention.
+# text. A final check fails on any leftover mention, and on any file in the
+# tree that still names the full server URL, except the documented ones
+# (URL_EXCEPTIONS below).
 #
 # Usage: sh scripts/directory-transform.sh [dir]          transform dir (default .) in place
 #        sh scripts/directory-transform.sh --check [dir]  only run the final check
@@ -88,15 +92,20 @@ swap_url() {
   done
 }
 
-# Files the plugin ships or a reviewer reads. CHANGELOG.md is history and
-# server.json is the MCP registry entry for the full server; both stay as on main.
+# Files that may keep the full server URL: CHANGELOG.md is history; server.json
+# (and any line about it) is the MCP registry entry for the full server; the
+# transform and its test name both URLs; build-openai-bundle.sh describes the
+# OpenAI portal submission, which is built from main and uses the full server.
+URL_EXCEPTIONS='CHANGELOG.md server.json scripts/directory-transform.sh scripts/test-directory-transform.sh scripts/build-openai-bundle.sh'
+# Files the plugin ships or a reviewer reads, checked for leftover names.
 NAMES='video_commission|videoCommissions|commission|includeImages|ai images?|ai video|(^|[^a-z])films?([^a-z]|$)|seventeen|17 tools|external_default'
 check() {
   cd "$1"
   bad=0
   grep -q "\"url\": \"$DIR_URL\"" .mcp.json || { echo "directory-transform: .mcp.json does not point at $DIR_URL" >&2; bad=1; }
+  grep -q "\"httpUrl\": \"$DIR_URL\"" gemini-extension.json || { echo "directory-transform: gemini-extension.json does not point at $DIR_URL" >&2; bad=1; }
   files=""
-  for f in .mcp.json hooks agents skills evals README.md SETUP.md AGENTS.md \
+  for f in .mcp.json gemini-extension.json .claude-plugin .codex-plugin hooks agents skills evals README.md SETUP.md AGENTS.md \
            scripts/spend-guard.sh scripts/job-watch.sh scripts/check-connector.sh scripts/test-hooks.sh; do
     if [ -e "$f" ]; then files="$files $f"; fi
   done
@@ -106,14 +115,17 @@ check() {
     echo "directory-transform: these lines name tools or features the directory server does not have:" >&2
     echo "$hits" | sed 's/^/  /' >&2; bad=1
   fi
-  # shellcheck disable=SC2086
-  hits=$(grep -rnE 'app\.sparkletree\.io/api/mcp([^/]|$)' $files | grep -v 'server\.json' || true)
+  # Every file in the tree, not only the list above: a new manifest that names
+  # the full server must not slip through.
+  hits=$(find . \( -name .git -o -path ./node_modules -o -path ./openai -o -path ./evals/results \) -prune -o -type f \
+      -exec grep -nE 'app\.sparkletree\.io/api/mcp([^/]|$)' /dev/null {} + | sed 's#^\./##' | grep -v 'server\.json' || true)
+  for f in $URL_EXCEPTIONS; do hits=$(printf '%s\n' "$hits" | grep -v "^$f:" || true); done
   if [ -n "$hits" ]; then
     echo "directory-transform: these lines still point at the full server $URL:" >&2
     echo "$hits" | sed 's/^/  /' >&2; bad=1
   fi
   [ $bad = 0 ] || exit 1
-  echo "ok: directory tree, .mcp.json at $DIR_URL"
+  echo "ok: directory tree, .mcp.json and gemini-extension.json at $DIR_URL"
 }
 
 only_check=0
@@ -125,6 +137,7 @@ cd "$dir"
 
 # Server URL.
 rep .mcp.json "\"url\": \"$URL\"" "\"url\": \"$DIR_URL\""
+rep gemini-extension.json "\"httpUrl\": \"$URL\"" "\"httpUrl\": \"$DIR_URL\""
 rep scripts/ci-validate.sh "mcp_url=$URL" "mcp_url=$DIR_URL"
 swap_url README.md SETUP.md skills/*/SKILL.md skills/*/references/*.md agents/*.md
 

@@ -37,9 +37,25 @@ at_base() { git show "$base:$1" 2>/dev/null | jq -r .version 2>/dev/null || echo
 plugin_base=$(at_base .claude-plugin/plugin.json); plugin_now=$(jq -r .version .claude-plugin/plugin.json)
 server_base=$(at_base server.json);               server_now=$(jq -r .version server.json)
 
-# Paths a plugin user can notice. Maintainer tooling under scripts/ is excluded.
-changed=$(git diff --name-only "$base" -- skills agents hooks assets .mcp.json scripts \
-  ':(exclude)scripts/ci-*.sh' ':(exclude)scripts/*directory-transform.sh' ':(exclude)scripts/bump-version.sh' ':(exclude)scripts/semver-cmp.sh' ':(exclude)scripts/build-openai-bundle.sh')
+# Paths a plugin user can notice, including every shipped manifest (the Claude,
+# Codex and Gemini manifests carry the connection config). Maintainer tooling
+# under scripts/ is excluded.
+changed=$(git diff --name-only "$base" -- skills agents hooks assets scripts \
+  .mcp.json .claude-plugin .codex-plugin gemini-extension.json \
+  ':(exclude)scripts/ci-*.sh' ':(exclude)scripts/*directory-transform.sh' ':(exclude)scripts/bump-version.sh' ':(exclude)scripts/semver-cmp.sh' ':(exclude)scripts/build-openai-bundle.sh' ':(exclude)scripts/test-ci-check-bump.sh')
+# A manifest whose only change is its version is the bump itself, not a change
+# that needs one.
+version_only() { # file
+  case "$1" in *.json) ;; *) return 1 ;; esac
+  [ -f "$1" ] || return 1
+  a=$(git show "$base:$1" 2>/dev/null | jq -S 'del(.version)' 2>/dev/null) || return 1
+  b=$(jq -S 'del(.version)' "$1" 2>/dev/null) || return 1
+  [ -n "$a" ] && [ "$a" = "$b" ]
+}
+kept=""
+for f in $changed; do version_only "$f" || kept="$kept$f
+"; done
+changed=$(printf '%s' "$kept")
 
 cmp() { sh scripts/semver-cmp.sh "$1" "$2"; }
 [ "$(cmp "$plugin_now" "$plugin_base")" != -1 ] || fail "plugin version went backwards: $plugin_base at $base, $plugin_now now"

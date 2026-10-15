@@ -24,6 +24,8 @@ validate:
     - apk add --no-cache jq git >/dev/null
     - sh scripts/ci-validate.sh
     - sh scripts/ci-check-bump.sh
+    - sh scripts/test-ci-check-bump.sh
+    - sh scripts/test-hooks.sh
     - sh scripts/test-directory-transform.sh
 
 # The real plugin validator. Non-blocking until it has run green on main a few
@@ -55,7 +57,8 @@ tag-plugin:
     - sh scripts/ci-tag.sh "plugin-v$VERSION" "SparkleTree plugin $VERSION"
 
 # Rebuild the `directory` branch (the version Anthropic's directory lists) from
-# this main commit: main with .mcp.json on /api/mcp/directory and the AI video
+# this main commit: main with .mcp.json and gemini-extension.json on
+# /api/mcp/directory and the AI video
 # commission and AI image material removed (scripts/directory-transform.sh).
 # Pushes with GITLAB_TAG_TOKEN; the push starts the directory branch's own
 # validate pipeline.

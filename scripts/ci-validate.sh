@@ -26,6 +26,7 @@ echo "$server_v" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$' || fail "server.json vers
 # connector lacks.
 mcp_url=https://app.sparkletree.io/api/mcp
 [ "$(jq -r '.sparkletree.url' .mcp.json)" = "$mcp_url" ] || fail ".mcp.json must point at $mcp_url"
+[ "$(jq -r '.mcpServers.sparkletree.httpUrl' gemini-extension.json)" = "$mcp_url" ] || fail "gemini-extension.json must point at $mcp_url"
 case "$mcp_url" in */directory) sh scripts/directory-transform.sh --check . >/dev/null || fail "the directory tree names tools the directory connector does not have" ;; esac
 [ "$(jq -r '.repository.url' server.json)" = "https://gitlab.com/sparkletree/sparkletree-plugin" ] || fail "server.json repository must be the GitLab plugin repo"
 

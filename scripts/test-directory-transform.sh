@@ -25,9 +25,20 @@ if sh $T "$tmp/a" >"$tmp/out" 2>&1; then ok "transform runs on this tree"; else 
 
 u=$(jq -r .sparkletree.url "$tmp/a/.mcp.json")
 [ "$u" = https://app.sparkletree.io/api/mcp/directory ] && ok ".mcp.json -> $u" || bad ".mcp.json url is $u"
+g=$(jq -r .mcpServers.sparkletree.httpUrl "$tmp/a/gemini-extension.json")
+[ "$g" = https://app.sparkletree.io/api/mcp/directory ] && ok "gemini-extension.json -> $g" || bad "gemini-extension.json httpUrl is $g"
+# Every JSON file that names a SparkleTree server URL names the directory one,
+# except the registry entry.
+for f in $(cd "$tmp/a" && find . -name '*.json' ! -path './evals/results/*' | sed 's#^\./##'); do
+  [ "$f" = server.json ] && continue
+  jq -r '.. | strings | select(test("app\\.sparkletree\\.io/api/mcp"))' "$tmp/a/$f" | while IFS= read -r v; do
+    [ "$v" = https://app.sparkletree.io/api/mcp/directory ] || echo "$f: $v"
+  done
+done > "$tmp/json-urls"
+[ -s "$tmp/json-urls" ] && { cat "$tmp/json-urls"; bad "a manifest still names another server URL"; } || ok "every manifest names the directory URL"
 
 # Only these files may differ from main, and no file may appear or disappear.
-allowed='.mcp.json AGENTS.md README.md SETUP.md agents/analytics-digest.md agents/campaign-reviewer.md
+allowed='.mcp.json gemini-extension.json AGENTS.md README.md SETUP.md agents/analytics-digest.md agents/campaign-reviewer.md
 evals/run-smoke.sh hooks/hooks.json scripts/ci-validate.sh scripts/job-watch.sh scripts/spend-guard.sh
 scripts/test-hooks.sh skills/adapt/SKILL.md skills/agency-workspaces/SKILL.md skills/launch-campaign/SKILL.md
 skills/launch-campaign/references/plan.md skills/setup/SKILL.md skills/sparkletree/SKILL.md
@@ -61,6 +72,12 @@ sh $T --check "$tmp/c" >/dev/null 2>&1 && bad "check missed a leftover video_com
 copy "$tmp/a" "$tmp/c2"
 sed 's#api/mcp/directory`#api/mcp`#' "$tmp/a/skills/setup/SKILL.md" > "$tmp/c2/skills/setup/SKILL.md"
 sh $T --check "$tmp/c2" >/dev/null 2>&1 && bad "check missed the full server URL" || ok "check catches the full server URL"
+copy "$tmp/a" "$tmp/c3"
+sed 's#api/mcp/directory"#api/mcp"#' "$tmp/a/gemini-extension.json" > "$tmp/c3/gemini-extension.json"
+sh $T --check "$tmp/c3" >/dev/null 2>&1 && bad "check missed gemini-extension.json on the full server" || ok "check catches gemini-extension.json on the full server"
+copy "$tmp/a" "$tmp/c4"
+mkdir -p "$tmp/c4/.cursor"; sed 's#api/mcp/directory"#api/mcp"#' "$tmp/a/.mcp.json" > "$tmp/c4/.cursor/mcp.json"
+sh $T --check "$tmp/c4" >/dev/null 2>&1 && bad "check missed a new manifest on the full server" || ok "check catches a new manifest on the full server"
 
 copy "$tmp/orig" "$tmp/d"
 sed 's/^## Commissioning a film$/## Films/' "$tmp/orig/skills/video/SKILL.md" > "$tmp/d/skills/video/SKILL.md"
