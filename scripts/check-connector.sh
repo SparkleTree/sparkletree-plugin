@@ -5,7 +5,7 @@
 # when SparkleTree fails its health check. Never blocks; always exits 0.
 # SPARKLETREE_SESSION_CONTEXT=off keeps the routing line out of the context.
 url="${SPARKLETREE_HEALTH_URL:-https://app.sparkletree.io/api/health}"
-route="SparkleTree plugin is installed. Before calling any SparkleTree tool, load the skill sparkletree:sparkletree (workspace, read before write, confirm before spend). Task skills: launch-campaign (new campaign), products (products, photos, file uploads), brand (brand book, voice, brand page), squid-design (custom Squid look, design video), review-variants, analytics (results, reports), status, video, surfaces-and-embed (embed, SDK, screens, QR), adapt (copy changes on a schedule), agency-workspaces, troubleshoot-connection."
+route="SparkleTree plugin is installed. Before calling any SparkleTree tool, load the skill sparkletree:sparkletree (workspace, read before write, confirm before spend). Task skills: launch-campaign (new campaign), products (products, photos, file uploads), brand (brand book, voice, brand page and site), squid-design (custom Squid look, templates, design checks, design video), review-variants, analytics (results, reports), status, video, surfaces-and-embed (embed, SDK, screens, QR), adapt (copy changes on a schedule), agency-workspaces, troubleshoot-connection."
 [ "${SPARKLETREE_SESSION_CONTEXT:-}" = off ] && route=""
 warn=""
 if command -v curl >/dev/null 2>&1 && ! curl -fsS --max-time 2 "$url" >/dev/null 2>&1; then

@@ -14,7 +14,7 @@
     ],
     "PreToolUse": [
       {
-        "matcher": "mcp__.*__(generate_campaign|render_video|video_commission|manage_campaigns|manage_products|manage_brand|manage_surfaces|upload_asset)$",
+        "matcher": "mcp__.*__(generate_campaign|render_video|video_commission|manage_campaigns|manage_products|manage_brand|manage_surfaces|upload_asset|query_campaigns)$",
         "hooks": [
           {
             "type": "command",

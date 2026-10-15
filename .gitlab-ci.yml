@@ -32,10 +32,14 @@ validate-plugin-cli:
   image: node:22-alpine
   allow_failure: true
   script:
+    - apk add --no-cache jq >/dev/null
     - npm install -g @anthropic-ai/claude-code >/dev/null 2>&1
+    # "." resolves to the marketplace file; the plugin manifest (hooks included) needs its own run.
     - claude plugin validate --strict .
+    - claude plugin validate --strict .claude-plugin/plugin.json
     - claude plugin validate --strict skills
     - claude plugin validate --strict agents
+    - sh scripts/test-hooks.sh
 
 # plugin-v<version> on the main commit that carries it. Idempotent.
 tag-plugin:
