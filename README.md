@@ -109,7 +109,20 @@ Four files carry a version. They describe two different things, so they do not a
 
 The rules:
 
-- The three plugin manifests are one version. They ship from the same commit and describe the same files, so they always carry the same number. `scripts/ci-validate.sh` fails the push when they differ or when `CHANGELOG.md` has no section for that version.
+- The three plugin manifests are one version. They ship from the same commit and describe the same files, so they always carry the same number.
 - `server.json` follows the server, not the plugin. The server lives in the SparkleTree monorepo, and its version there (`MCP_SERVER_VERSION`) and the one here must agree; the monorepo's `mcp-version-sync` job fails a merge request while they differ. A skill or docs change here never bumps it.
-- The registry publish on `main` reads `server.json` only. It skips when the registry already lists that version and fails when the version was published before but is no longer the latest. Keeping the two numbers independent means a plugin-only release is a no-op for the registry.
 - When a server change lands, both move: bump `server.json` to match the server, bump the plugin manifests because the skills that describe the tools changed, and name the registry version in the changelog entry (as 0.1.3 does for registry 1.0.2).
+
+Releasing:
+
+1. `scripts/bump-version.sh plugin 0.1.4` rewrites the three manifests and opens a changelog stub; `scripts/bump-version.sh server 1.0.3` rewrites `server.json` and adds a changelog line. Fill in the stub.
+2. `sh scripts/ci-validate.sh && sh scripts/ci-check-bump.sh` runs the same checks CI runs.
+3. Commit and push. On `main`, CI tags the commit `plugin-v<version>`, and the publish job tags `server-v<version>` once the registry lists that version.
+
+What CI enforces on every push (`scripts/ci-validate.sh`, `scripts/ci-check-bump.sh`):
+
+- The three plugin manifests agree, and `CHANGELOG.md` has a section for that version and mentions the current `server.json` version.
+- A change under `skills/`, `agents/`, `hooks/`, `assets/`, `.mcp.json` or the hook scripts without a plugin bump fails. Neither version may go backwards.
+- On `main`, the registry publish reads `server.json` only. It skips when the registry already lists that version, and refuses when the version was published before or is lower than the registry's latest. A plugin-only release is therefore a no-op for the registry.
+
+Tagging needs one CI variable, `GITLAB_TAG_TOKEN` (project access token, Maintainer, `write_repository`, protected and masked). Without it the tag steps print a note and pass.

@@ -5,7 +5,7 @@ Any change to a tool schema on the server bumps the plugin version, gets a note 
 ## 0.1.3
 
 - Skills follow the server's brand-page and playbook additions (registry 1.0.2): `query_brand` `get_page`, `manage_brand` `create_page` / `publish_page` / `revert_page`, the `mosaic://brand-page-guide` resource, and `manage_campaigns` `generate_playbook`. `brand-voice-sync` gains a section on authoring the brand home page (draft with preview URL, publish on approval, revert). `launch-campaign` explains when a campaign has no playbook and how to add one. `/sparkletree:adapt` can target the brand home page. Tool reference updated.
-- README "Versions" section: the three plugin manifests share one version, `server.json` follows the hosted server. `gemini-extension.json` caught up from 0.1.2, and `scripts/ci-validate.sh` now checks it.
+- Versioning made explicit and enforced. README "Versions": the three plugin manifests share one version, `server.json` follows the hosted server. `gemini-extension.json` caught up from 0.1.2. New `scripts/bump-version.sh plugin|server X.Y.Z`. CI now fails when the Gemini manifest disagrees, when the changelog does not mention the registry version, when user-visible files change without a plugin bump, or when a version goes backwards (`scripts/ci-check-bump.sh`); refuses to publish a `server.json` below the registry's latest; tags `plugin-v` and `server-v` on main (`scripts/ci-tag.sh`, needs `GITLAB_TAG_TOKEN`); runs `claude plugin validate --strict` non-blocking.
 
 ## 0.1.2
 

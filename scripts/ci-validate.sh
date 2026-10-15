@@ -25,6 +25,7 @@ echo "$server_v" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$' || fail "server.json vers
 [ "$(jq -r '.repository.url' server.json)" = "https://gitlab.com/sparkletree/sparkletree-plugin" ] || fail "server.json repository must be the GitLab plugin repo"
 
 grep -q "^## $claude_v\$" CHANGELOG.md || fail "CHANGELOG.md has no '## $claude_v' section for the plugin version"
+grep -Eq '(server\.json`? |registry )'"$server_v"'([^0-9]|$)' CHANGELOG.md || fail "CHANGELOG.md never mentions registry version $server_v (write 'registry $server_v' or '\`server.json\` $server_v' in the entry that moved it)"
 
 # The claude.ai / desktop marketplace importer walks the whole tree and rejects
 # any plugin.json that is not at the root .claude-plugin/ (plugin 0.1.1 lesson).
