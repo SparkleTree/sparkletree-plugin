@@ -74,7 +74,7 @@ If the user already approved the HTML, `create_component` with `publish: true` (
 
 ## 8. Record it as a video
 
-For a social clip of a variant that runs a published design: `render_video` `mode: squid` with `campaignId`, `variantId`, optional `formats` (9:16, 4:5, 1:1, 16:9; default 9:16 and 4:5) and `durationS` (3 to 60, default the manifest length). It is recorded in a sandbox, not with render credits, and counts against 20 recordings per workspace per day; confirm first. A Starter workspace or one without an active plan cannot record (`forbidden`). Poll `query_video` `action: progress` with the same `campaignId` and `variantId` every 15 to 30 seconds; each row in `squidExports[]` ends `ready` with `videoUrl` and `posterUrl`, or `failed` with an `error`. A 16:9 row may appear that you did not ask for; it is the share video.
+For a social clip of a variant that runs a published design: `render_video` `mode: squid` with `campaignId`, `variantId`, optional `formats` (9:16, 4:5, 1:1, 16:9; default 9:16 and 4:5) and `durationS` (3 to 60, default the manifest length). It is recorded in a sandbox, not on the template renderer, and counts against 20 recordings per workspace per day; confirm first. A Starter workspace or one without an active plan cannot record (`forbidden`). Poll `query_video` `action: progress` with the same `campaignId` and `variantId` every 15 to 30 seconds; each row in `squidExports[]` ends `ready` with `videoUrl` and `posterUrl`, or `failed` with an `error`. A 16:9 row may appear that you did not ask for; it is the share video.
 
 ## Errors
 

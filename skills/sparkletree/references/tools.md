@@ -18,9 +18,9 @@ Seventeen tools on the bare URL (`external_default`). Reads and writes never sha
 | `manage_brand` | write | `action: update_brandbook, update_profile, update_voice, update_concierge, set_logo, create_page, edit_page, create_version, put_files, create_file_upload, delete_files, publish_page, revert_page, delete_page, render_check` | Annotated destructive and not idempotent, so some hosts ask before every call. Roles and plan: see below. Each brand data subtree you send replaces the stored one; subtrees you omit are kept. `set_logo` takes `logoSlot` (primary default, light, dark, icon) and exactly one of `logoAssetId`, `logoUrl`; a link is copied into the workspace, SVG is refused |
 | `query_analytics` | read | `action: snapshot, export, ab_test, cvg_dashboard, insights` | `snapshot` needs `startDate`, `endDate`; `sections` default `["summary"]`, others timeseries, funnel, cohorts, abTests, insights, products, breakdowns, spend (plan gated; fails the whole call without it), video, live, creatives (`creativesLimit` 1 to 200, default 50). `export` takes `includeCreatives`. Window caps: hourly 14 days, daily 366. See below |
 | `query_video` | read | `action: templates, progress, renders` | `templates` with `templateId` (logo-reveal, kinetic-promo, lightscribe) expands its props. `progress` takes one of: `campaignVideoRenderId`; `renderId` plus `bucketName`; `campaignId` plus `variantId` (Squid design exports) |
-| `render_video` | write, credits | `mode: video, campaign, still, squid` | `video`, `campaign` and `still` use render credits; `squid` is recorded in a sandbox. See below |
+| `render_video` | write, daily limit | `mode: video, campaign, still, squid` | `video`, `campaign` and `still` render within a daily per-workspace limit; `squid` is recorded in a sandbox. See below |
 | `query_video_commissions` | read | `action: list, get` | Poll `get` until `proof_ready` or `delivered` |
-| `video_commission` | write, credits, metered | `action: create, approve, revise, cancel` | `create` takes `briefMd` (the description of the film), `aspects`, `targetDurationS` (max 30), optional `tier: marquee or atelier`. Five per workspace per day |
+| `video_commission` | write, daily limit | `action: create, approve, revise, cancel` | `create` takes `briefMd` (the description of the film), `aspects`, `targetDurationS` (max 30), optional `tier: marquee or atelier`. Five per workspace per day |
 
 ## manage_campaigns
 
@@ -115,7 +115,7 @@ Pass the `assetId` to the field that takes one: `manage_products` `imageAssetId`
 | `still` | `templateId`, `props`, optional `atSeconds` | One frame. The cheap iteration |
 | `video` | `templateId`, `props`, `quality` (draft or final) | Returns `renderId` and `bucketName`. 50 ad hoc renders per workspace per day |
 | `campaign` | `campaignId`, optional `variantId`, `aspect` (16:9, 9:16, 1:1), `quality` | Without `variantId`, up to four active variants. Returns `campaignVideoRenderId` per variant |
-| `squid` | `campaignId`, `variantId`, optional `formats` (9:16, 4:5, 1:1, 16:9), `durationS` (3 to 60) | Records a variant that runs a published custom design in a sandbox, not with render credits. 20 runs per workspace per day. A Starter workspace or one without an active plan gets `forbidden`; `upstream_error` means the plan lookup failed and nothing was queued. Poll `query_video` `progress` with `campaignId` and `variantId`; results are `squidExports[]`. Off on some deployments (`precondition_failed`, "not available") |
+| `squid` | `campaignId`, `variantId`, optional `formats` (9:16, 4:5, 1:1, 16:9), `durationS` (3 to 60) | Records a variant that runs a published custom design in a sandbox, not on the template renderer. 20 runs per workspace per day. A Starter workspace or one without an active plan gets `forbidden`; `upstream_error` means the plan lookup failed and nothing was queued. Poll `query_video` `progress` with `campaignId` and `variantId`; results are `squidExports[]`. Off on some deployments (`precondition_failed`, "not available") |
 
 ## The generate_campaign intent
 

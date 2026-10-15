@@ -21,7 +21,7 @@
 - Impressions: delivery count, one per load. Reloads inflate it. In `query_analytics` at day granularity and up, the headline figure includes Meta Ads impressions; `channels` splits SparkleTree and Meta.
 - Reach: distinct SparkleTree sessions that saw the campaign. Per tab, cleared on close. Meta reach is reported separately and never added.
 - CTR (sessions): clicks over sessions reached. The number to compare creatives on.
-- Credits: the workspace's monthly pool for AI generation, AI images and rendering. Blocked actions return `precondition_failed`; published campaigns keep serving.
+- Credits: the workspace's monthly pool for AI generation and AI images. Video renders and film commissions are not paid in credits; they have daily per-workspace limits. Blocked actions return `precondition_failed`; published campaigns keep serving.
 - Sandbox allowance: the daily count for work that runs in a sandbox browser: design checks, brand page render checks and Squid design videos, 20 each per workspace per day.
 - Brand site: a brand page version with more files than `index.html` (more pages, CSS, scripts, images).
 - Profile: the set of tools a connection sees. Selected by a call code, not a name. Visibility only, never permission.

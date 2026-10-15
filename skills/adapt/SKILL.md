@@ -22,7 +22,7 @@ Map the sentence to exactly one write and read its current state first:
 | Brand voice, tagline, dos and donts | `query_brand` `action: get` | `manage_brand` `action: update_voice` or `update_brandbook` |
 | The brand home page itself (an agent-authored page) | `query_brand` `action: get_page` with `pageId` (the HTML and its `sha256`) | `manage_brand` `action: edit_page` with exact-text `edits` and `expectedSha256` (a draft), then `publish_page` on approval; `create_page` only for a new page; `revert_page` restores the default. See `skills/brand` section 6. |
 
-Name the campaign or brand subtree by name and id and echo it back. Brand writes need the admin role; if the user is not an admin, prepare the text and hand it over instead. Never target `generate_campaign`, `render_video`, `video_commission`, `manage_products` `import_from_url` or `manage_campaigns` `generate_playbook` from this skill: they spend credits and a scheduled run cannot answer the spend hook.
+Name the campaign or brand subtree by name and id and echo it back. Brand writes need the admin role; if the user is not an admin, prepare the text and hand it over instead. Never target `generate_campaign`, `render_video`, `video_commission`, `manage_products` `import_from_url` or `manage_campaigns` `generate_playbook` from this skill: they spend credits or daily render allowances, and a scheduled run cannot answer the spend hook.
 
 ## 2. Resolve the source
 

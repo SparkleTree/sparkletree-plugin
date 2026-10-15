@@ -5,7 +5,7 @@ description: SparkleTree video. Render a short video or still from a campaign or
 
 # Video
 
-Two tools, two price classes. `render_video` renders a template; a still or a draft is cheap, a final render costs credits. Ad hoc template renders are capped at 50 per workspace per day. `video_commission` queues an agent-authored brand film with proofs and revision rounds; five per workspace per day, each round metered; it is the expensive path. Default to `render_video`; offer a commission only when the user asks for a bespoke film.
+Two tools, two price classes. `render_video` renders a template; a still or a draft is cheap, a final render is the expensive end; all count against a daily per-workspace limit. Ad hoc template renders are capped at 50 per workspace per day. `video_commission` queues an agent-authored brand film with proofs and revision rounds; five per workspace per day, each with a fixed number of revision rounds; it is the expensive path. Default to `render_video`; offer a commission only when the user asks for a bespoke film.
 
 ## 1. Pick the source
 
@@ -19,11 +19,11 @@ Two tools, two price classes. `render_video` renders a template; a still or a dr
 
 ## 3. Cheap iteration
 
-Before any final render, show the user a still: `render_video` `mode: still` with `templateId`, `props`, optional `atSeconds`. Returns an image URL. For a template render, `quality: "draft"` is the next step up. Both spend from the credit pool; say so, but they are the cheap end.
+Before any final render, show the user a still: `render_video` `mode: still` with `templateId`, `props`, optional `atSeconds`. Returns an image URL. For a template render, `quality: "draft"` is the next step up. Both count against the daily render limit; say so, but they are the cheap end.
 
 ## 4. Confirm, then render
 
-State the mode, the campaign or template, the aspect, the quality and that it spends workspace credits. On yes:
+State the mode, the campaign or template, the aspect, the quality and that it counts against the workspace's daily render limit. On yes:
 
 - `render_video` `mode: campaign` with `campaignId`, optional `variantId` (one variant, otherwise up to four active variants), `aspect` (16:9 default, 9:16, 1:1), `quality` (draft or final). Returns one `campaignVideoRenderId` per variant.
 - A variant that runs a custom Squid design is recorded with `mode: squid` instead; see `skills/squid-design` section 8.

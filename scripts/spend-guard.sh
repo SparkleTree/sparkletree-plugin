@@ -70,15 +70,15 @@ case "$suffix" in
   render_video)
     level=spend
     case "$mode" in
-      still) msg="render_video mode=still renders one frame. It is the cheap iteration but still spends workspace credits." ;;
+      still) msg="render_video mode=still renders one frame. It is the cheap iteration but counts against the daily render limit." ;;
       squid) msg="render_video mode=squid records a variant's published Squid design as video in a sandbox (20 recordings per workspace per day; not on Starter). Confirm the variant and formats." ;;
-      *) msg="render_video (mode=${mode:-video}) spends workspace credits. Iterate with mode=still or quality=draft before a final render." ;;
+      *) msg="render_video (mode=${mode:-video}) starts a render that counts against the workspace daily render limit. Iterate with mode=still or quality=draft before a final render." ;;
     esac ;;
   video_commission)
     case "$action" in
-      create) level=spend; msg="video_commission action=create queues a metered film commission (credits, five per workspace per day). Confirm the description, aspect, duration and tier." ;;
-      approve) level=spend; msg="video_commission action=approve queues the final render and spends credits again." ;;
-      revise) level=spend; msg="video_commission action=revise spends a metered revision round. Confirm the notes and that rounds remain." ;;
+      create) level=spend; msg="video_commission action=create queues a film commission (five per workspace per day, limited revision rounds). Confirm the description, aspect, duration and tier." ;;
+      approve) level=spend; msg="video_commission action=approve queues the final render of the film." ;;
+      revise) level=spend; msg="video_commission action=revise uses one of the limited revision rounds. Confirm the notes and that rounds remain." ;;
       cancel) level=live; msg="video_commission action=cancel stops a commission; spent rounds are not refunded." ;;
     esac ;;
   manage_products)
