@@ -21,7 +21,12 @@ echo "$server_v" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$' || fail "server.json vers
 
 [ "$(jq -r .name server.json)" = "io.sparkletree/sparkletree" ] || fail "server.json name must be io.sparkletree/sparkletree"
 [ "$(jq -r '.remotes[0].url' server.json)" = "https://app.sparkletree.io/api/mcp" ] || fail "server.json remote must be https://app.sparkletree.io/api/mcp"
-[ "$(jq -r '.sparkletree.url' .mcp.json)" = "https://app.sparkletree.io/api/mcp" ] || fail ".mcp.json must point at https://app.sparkletree.io/api/mcp"
+# The generated `directory` branch points at the directory connector instead
+# (scripts/directory-transform.sh rewrites mcp_url) and must name nothing that
+# connector lacks.
+mcp_url=https://app.sparkletree.io/api/mcp
+[ "$(jq -r '.sparkletree.url' .mcp.json)" = "$mcp_url" ] || fail ".mcp.json must point at $mcp_url"
+case "$mcp_url" in */directory) sh scripts/directory-transform.sh --check . >/dev/null || fail "the directory tree names tools the directory connector does not have" ;; esac
 [ "$(jq -r '.repository.url' server.json)" = "https://gitlab.com/sparkletree/sparkletree-plugin" ] || fail "server.json repository must be the GitLab plugin repo"
 
 grep -q "^## $claude_v\$" CHANGELOG.md || fail "CHANGELOG.md has no '## $claude_v' section for the plugin version"

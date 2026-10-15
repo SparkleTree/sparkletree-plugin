@@ -10,6 +10,9 @@ set -eu
 cd "$(dirname "$0")/.."
 fail() { echo "FAIL: $*" >&2; exit 1; }
 
+# The directory branch is generated from main, which carries the bump check.
+if [ "${CI_COMMIT_BRANCH:-}" = directory ]; then echo "skip: directory is generated from main"; exit 0; fi
+
 base=${1:-}
 if [ -z "$base" ]; then
   if [ -n "${CI_COMMIT_BEFORE_SHA:-}" ] && [ "$CI_COMMIT_BEFORE_SHA" != "0000000000000000000000000000000000000000" ]; then
@@ -36,7 +39,7 @@ server_base=$(at_base server.json);               server_now=$(jq -r .version se
 
 # Paths a plugin user can notice. Maintainer tooling under scripts/ is excluded.
 changed=$(git diff --name-only "$base" -- skills agents hooks assets .mcp.json scripts \
-  ':(exclude)scripts/ci-*.sh' ':(exclude)scripts/bump-version.sh' ':(exclude)scripts/semver-cmp.sh' ':(exclude)scripts/build-openai-bundle.sh')
+  ':(exclude)scripts/ci-*.sh' ':(exclude)scripts/*directory-transform.sh' ':(exclude)scripts/bump-version.sh' ':(exclude)scripts/semver-cmp.sh' ':(exclude)scripts/build-openai-bundle.sh')
 
 cmp() { sh scripts/semver-cmp.sh "$1" "$2"; }
 [ "$(cmp "$plugin_now" "$plugin_base")" != -1 ] || fail "plugin version went backwards: $plugin_base at $base, $plugin_now now"
