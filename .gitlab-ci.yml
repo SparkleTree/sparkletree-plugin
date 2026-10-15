@@ -52,7 +52,7 @@ tag-plugin:
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
   script:
-    - apk add --no-cache curl jq >/dev/null
+    - apk add --no-cache git jq >/dev/null
     - VERSION=$(jq -r .version .claude-plugin/plugin.json)
     - sh scripts/ci-tag.sh "plugin-v$VERSION" "SparkleTree plugin $VERSION"
 
@@ -60,10 +60,11 @@ tag-plugin:
 # this main commit: main with .mcp.json and gemini-extension.json on
 # /api/mcp/directory and the AI video
 # commission and AI image material removed (scripts/directory-transform.sh).
-# Pushes with GITLAB_TAG_TOKEN; the push starts the directory branch's own
-# validate pipeline.
+# Validates the generated tree with the plugin CLI, then pushes with the job
+# token (a job-token push starts no pipeline of its own).
 directory-branch:
   stage: publish
+  image: node:22-alpine
   needs:
     - validate
   rules:
@@ -71,6 +72,7 @@ directory-branch:
   resource_group: directory-branch
   script:
     - apk add --no-cache git jq >/dev/null
+    - npm install -g @anthropic-ai/claude-code >/dev/null 2>&1
     - sh scripts/ci-directory-branch.sh
 
 # Publish server.json to the official MCP registry when its version is ahead of
@@ -82,7 +84,7 @@ publish-registry:
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
   script:
-    - apk add --no-cache curl jq openssl >/dev/null
+    - apk add --no-cache curl git jq openssl >/dev/null
     - VERSION=$(jq -r .version server.json)
     - LATEST=$(curl -fsS --retry 3 "$REGISTRY_VERSIONS_URL" | jq -r '.servers[] | select(._meta["io.modelcontextprotocol.registry/official"].isLatest == true) | .server.version')
     - PUBLISHED=$(curl -fsS --retry 3 "$REGISTRY_VERSIONS_URL" | jq -r '.servers[].server.version')
