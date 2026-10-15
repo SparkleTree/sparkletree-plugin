@@ -149,7 +149,7 @@ At least one product must resolve; list products first with `query_products` `ac
 
 Resources: `mosaic://capabilities` (tools, prompts and the recommended call order for product images, manual and AI campaigns, the brand page, brand sites, Squid designs and Squid templates), `mosaic://brand-page-guide`, `mosaic://campaigns/{id}/squid-component-guide` (the same guide `get_component` returns), `mosaic://org/{id}`, `mosaic://org/{id}/brand-guidelines`, `mosaic://campaigns/{id}`, `mosaic://products/{id}`, `mosaic://surfaces/{id}`, and `ui://mosaic/campaign-inspector@2`, the campaign inspector that hosts with MCP Apps render for `query_campaigns` and `generate_campaign`.
 
-Prompts on the default profile: `campaign_brief` (titled Create Campaign Plan; goal, brandName, targetAudience, budget), `analytics_deep_dive`, `surface_network_planner`, `content_optimizer`, `platform_onboarding`. `mosaic://capabilities` also lists `ai_studio_image_workflow`, but the default profile does not serve it.
+Prompts on the default profile: `campaign_brief` (titled Create Campaign Plan; goal, brandName, targetAudience, budget), `analytics_deep_dive`, `surface_network_planner`, `content_optimizer`, `platform_onboarding`. The prompt list in `mosaic://capabilities` names exactly the prompts the connection's profile serves.
 
 ## Roles
 
