@@ -1,11 +1,11 @@
 #!/bin/sh
-# PreToolUse for SparkleTree write tools. POSIX sh; uses jq when present and
-# falls back to sed and awk. Keys on the tool-name suffix, so the
-# plugin-scoped name, a hand-added server and a claude.ai connector id all
-# behave the same. No query_* tool reaches this hook: every one is a pure
-# read. The two actions that use a workspace allowance without changing
-# campaign data (check_component, match_templates) are manage_campaigns
-# actions.
+# PreToolUse for SparkleTree write tools. POSIX sh. jq is the only parser: the
+# guard never reads a decision out of the JSON by text search. Keys on the
+# suffix of the top-level tool_name, so the plugin-scoped name, a hand-added
+# server and a claude.ai connector id all behave the same. No query_* tool
+# reaches this hook: every one is a pure read. The two actions that use a
+# workspace allowance without changing campaign data (check_component,
+# match_templates) are manage_campaigns actions.
 #
 # 1. A query_* call that reaches the script anyway (a hand-written matcher)
 #    passes silently, first.
@@ -21,43 +21,114 @@
 #    within 15 minutes passes. Other guarded calls pass without a prompt in
 #    those modes. SPARKLETREE_SPEND_GUARD=prompt-only turns the deny-once off;
 #    SPARKLETREE_SPEND_GUARD=off turns the whole guard off.
+#    The yes is a marker file named by a SHA-256 digest of the session id, the
+#    full tool_name and the canonical tool_input (jq -cS), so it fits only that
+#    call on that connector in that session. It holds the refusal time and
+#    counts from 2 seconds to 15 minutes after it. It is consumed with mv, so
+#    when identical calls race, only one goes through.
 # 5. A second paid start while one from this session is still recent gets a
 #    warning in the reason (markers written by job-watch.sh).
-# Anything unrecognised passes through silently (exit 0, no output).
+# 6. Fail closed. Without jq, or when the input is not a JSON object with a
+#    string tool_name and an object tool_input, the guard cannot tell one call
+#    from another. Every call that reaches it is then denied inside the
+#    read-only agents, gets "ask" in prompting modes, and goes through the
+#    deny-once step otherwise (or when the mode cannot be read). The reason
+#    names the problem. Without a SHA-256 tool (shasum, sha256sum, openssl)
+#    the deny-once step cannot record a yes and denies every time.
+# A call the guard does not recognise passes through silently (exit 0, no
+# output) only on the jq path.
 [ "${SPARKLETREE_SPEND_GUARD:-}" = off ] && exit 0
 input=$(cat | tr -d '\n')
 data=${1:-${CLAUDE_PLUGIN_DATA:-}}
 [ -n "$data" ] || data="${TMPDIR:-/tmp}/sparkletree-plugin"
 
 have_jq=0; command -v jq >/dev/null 2>&1 && have_jq=1
-[ "${SPARKLETREE_NO_JQ:-}" = 1 ] && have_jq=0  # tests exercise the sed path
-top() { # top-level string field
-  if [ $have_jq = 1 ]; then printf '%s' "$input" | jq -r --arg k "$1" '.[$k] // empty | tostring' 2>/dev/null
-  else printf '%s' "$input" | sed -n 's/.*"'"$1"'"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p'; fi
-}
-arg() { # tool_input field; without jq, the first match after "tool_input"
-  if [ $have_jq = 1 ]; then printf '%s' "$input" | jq -r --arg k "$1" '.tool_input[$k] // empty | tostring' 2>/dev/null
-  else printf '%s' "$input" | awk -v k="\"$1\"" '{ i = index($0, "\"tool_input\""); if (!i) exit
-      s = substr($0, i); j = index(s, k); if (!j) exit
-      s = substr(s, j + length(k)); sub(/^[ \t]*:[ \t]*"?/, "", s)
-      if (match(s, /^[A-Za-z0-9_]+/)) print substr(s, 1, RLENGTH) }'; fi
-}
-clean() { tr -cd 'A-Za-z0-9_-'; }
-
-tool=$(top tool_name); suffix=${tool##*__}
-action=$(arg action | clean); mode=$(arg mode | clean); operation=$(arg operation | clean)
-status=$(arg status | clean); publish=$(arg publish | clean)
-agent=$(top agent_type); pmode=$(top permission_mode | clean)
-session=$(top session_id | clean); [ -n "$session" ] || session=nosession
-
-# Reads pass.
-case "$suffix" in query_*) exit 0 ;; esac
+[ "${SPARKLETREE_NO_JQ:-}" = 1 ] && have_jq=0  # tests: behave as if jq were missing
 
 out() { # decision reason
   reason=$(printf '%s' "$2" | sed 's/\\/\\\\/g; s/"/\\"/g')
   printf '{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"%s","permissionDecisionReason":"%s"}}\n' "$1" "$reason"
   exit 0
 }
+
+sha256() { # stdin -> lowercase hex digest, or nothing when no tool exists
+  if command -v shasum >/dev/null 2>&1; then d=$(shasum -a 256 | cut -d' ' -f1)
+  elif command -v sha256sum >/dev/null 2>&1; then d=$(sha256sum | cut -d' ' -f1)
+  elif command -v openssl >/dev/null 2>&1; then d=$(openssl dgst -sha256 | sed 's/.*= *//')
+  else cat >/dev/null; d=""; fi
+  case "$d" in *[!0-9a-f]*) d="" ;; esac
+  [ ${#d} = 64 ] && printf '%s' "$d"
+}
+
+# deny_once KEY REASON, for auto, bypassPermissions and dontAsk. KEY is the
+# text that identifies the call; empty means it cannot be matched to a yes.
+deny_once() {
+  [ "${SPARKLETREE_SPEND_GUARD:-}" = prompt-only ] && exit 0
+  [ -n "$1" ] || out deny "$2 This call cannot be matched to an earlier yes, so the guard refuses it every time. Ask the user to install jq or to set SPARKLETREE_SPEND_GUARD=prompt-only."
+  sig=$(printf '%s' "$1" | sha256)
+  [ -n "$sig" ] || out deny "$2 No SHA-256 tool (shasum, sha256sum or openssl) is installed, so the guard cannot record a yes and refuses this call every time. Ask the user to install one or to set SPARKLETREE_SPEND_GUARD=prompt-only."
+  mkdir -p "$data/confirm" 2>/dev/null
+  c="$data/confirm/$sig"; taken="$c.$$"; now=$(date +%s)
+  # mv is atomic: of several identical calls racing for one yes, one wins. A
+  # yes counts from 2 seconds after the refusal, so a loser's fresh marker
+  # cannot let a call from the same burst through.
+  if mv "$c" "$taken" 2>/dev/null; then
+    then_s=$(tr -cd '0-9' < "$taken" 2>/dev/null); rm -f "$taken"
+    case "$then_s" in ''|*[!0-9]*) ;; *)
+      age=$((now - then_s)); [ "$age" -ge 2 ] && [ "$age" -lt 900 ] && exit 0 ;;
+    esac
+  fi
+  printf '%s\n' "$now" > "$c" 2>/dev/null
+  out deny "$2 Stop, tell the user what this call does and what it costs, and ask in chat. Only after an explicit yes, make exactly the same call again within 15 minutes."
+}
+
+# Can the call be read? Anything else fails closed.
+why=""
+if [ $have_jq = 0 ]; then
+  why="jq is not installed, so the SparkleTree spend guard cannot read this call and treats every SparkleTree write as one that needs a yes."
+elif ! printf '%s' "$input" | jq -e 'type == "object" and (.tool_name | type) == "string" and (.tool_input | type) == "object"' >/dev/null 2>&1; then
+  why="The SparkleTree spend guard could not read this call (not a JSON object with a string tool_name and an object tool_input), so it treats it as one that needs a yes."
+fi
+
+if [ -n "$why" ]; then
+  # Every value of a key anywhere in the text. Used only where an extra,
+  # nested value can make the answer stricter, never looser.
+  vals() {
+    printf '%s' "$input" | awk -v k="$1" '{ s = $0; re = "\"" k "\"[ \t]*:[ \t]*\"[^\"]*\""
+      while (match(s, re)) { m = substr(s, RSTART, RLENGTH); s = substr(s, RSTART + RLENGTH)
+        sub(/^[^:]*:[ \t]*"/, "", m); sub(/"$/, "", m); print m } }'
+  }
+  for a in $(vals agent_type | tr -cd 'A-Za-z0-9_:\n-'); do
+    case "$a" in *campaign-reviewer|*analytics-digest)
+      out deny "SparkleTree: $why This runs inside a read-only agent, so the call is refused. Return it as a proposed call for the parent to confirm with the user." ;;
+    esac
+  done
+  # A prompt only when every permission_mode in the text is a prompting mode.
+  prompting=0
+  for m in $(vals permission_mode | tr -cd 'A-Za-z0-9_\n-'); do
+    case "$m" in default|acceptEdits|plan) prompting=1 ;; *) prompting=0; break ;; esac
+  done
+  [ $prompting = 1 ] && out ask "SparkleTree: $why Install jq to let reads and drafts through without a prompt."
+  # A retry differs only in tool_use_id: blank it when it occurs once. When it
+  # occurs more than once the call cannot be keyed.
+  key=""
+  if [ "$(vals tool_use_id | wc -l | tr -d ' ')" -le 1 ]; then
+    key=$(printf '%s' "$input" | awk '{ sub(/"tool_use_id"[ \t]*:[ \t]*"[^"]*"/, "\"tool_use_id\":\"\""); print }')
+  fi
+  deny_once "$key" "SparkleTree: $why This session may run without permission prompts, so no prompt can appear."
+fi
+
+fields=$(printf '%s' "$input" | jq -r '[.tool_name, .agent_type, .permission_mode, .session_id,
+    (.tool_input | .action, .mode, .operation, .status, .publish)]
+  | map(if . == null then "" else tostring | gsub("[^A-Za-z0-9_:-]"; "") end) | join("|")' 2>/dev/null)
+IFS='|' read -r tool agent pmode session action mode operation status publish <<EOF
+$fields
+EOF
+suffix=${tool##*__}
+session=$(printf '%s' "$session" | tr -cd 'A-Za-z0-9_-'); [ -n "$session" ] || session=nosession
+
+# Reads pass.
+case "$suffix" in query_*) exit 0 ;; esac
 
 case "$agent" in
   *campaign-reviewer|*analytics-digest)
@@ -127,7 +198,7 @@ esac
 case "$suffix" in generate_campaign|render_video|video_commission)
   m="$data/jobs/$session-$suffix"
   if [ -f "$m" ] && [ "$action" != approve ] && [ "$action" != revise ] && [ "$action" != cancel ]; then
-    then_s=$(cat "$m" 2>/dev/null | clean); now_s=$(date +%s)
+    then_s=$(tr -cd '0-9' < "$m" 2>/dev/null); now_s=$(date +%s)
     case "$then_s" in ''|*[!0-9]*) ;; *)
       mins=$(( (now_s - then_s) / 60 ))
       [ "$mins" -lt 30 ] && msg="$msg A $suffix job started in this session $mins min ago. If it is still running, poll it instead: starting again is a second paid job." ;;
@@ -138,13 +209,7 @@ esac
 case "$pmode" in
   auto|bypassPermissions|dontAsk)
     [ "$level" = spend ] || exit 0
-    [ "${SPARKLETREE_SPEND_GUARD:-}" = prompt-only ] && exit 0
-    if [ $have_jq = 1 ]; then sig=$(printf '%s' "$input" | jq -c '.tool_input' 2>/dev/null | cksum | cut -d' ' -f1)
-    else sig="$action$mode"; fi
-    mkdir -p "$data/confirm" 2>/dev/null
-    c="$data/confirm/$session-$suffix-$sig"
-    if [ -f "$c" ] && [ -n "$(find "$c" -mmin -15 2>/dev/null)" ]; then rm -f "$c"; exit 0; fi
-    : > "$c" 2>/dev/null
-    out deny "SparkleTree: $msg This session runs in $pmode mode, so no permission prompt can appear. Stop, tell the user what this call does and what it costs, and ask in chat. Only after an explicit yes, make exactly the same call again within 15 minutes." ;;
+    deny_once "$(printf '%s' "$input" | jq -cS '{s: (.session_id // ""), t: .tool_name, i: .tool_input}' 2>/dev/null)" \
+      "SparkleTree: $msg This session runs in $pmode mode, so no permission prompt can appear." ;;
 esac
 out ask "SparkleTree: $msg"
