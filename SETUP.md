@@ -29,7 +29,7 @@ Run `/sparkletree:setup`. It confirms which workspace you are in, reads what exi
 
 ## 5. First campaign
 
-`/sparkletree:launch https://your-site/products/one-product` or `/sparkletree:launch <a one-sentence goal>`. You see the brief before anything is generated, approve it, and get a live URL at the end. Generation spends credits from the workspace's monthly pool; publishing is free.
+`/sparkletree:launch https://your-site/products/one-product` or `/sparkletree:launch <a one-sentence goal>`. You see the campaign plan before anything is generated, approve it, and get a live URL at the end. Generation spends credits from the workspace's monthly pool, including credits for each AI image, set aside when it starts; publishing is free.
 
 ## 6. Where it runs
 
@@ -37,7 +37,9 @@ Publishing puts the campaign on your brand page (`<name>.sparkletree.io` or your
 
 ## What asks for confirmation
 
-Reads never ask. Publish, deploy, delete, and anything that generates or renders ask first, in the conversation and again through the plugin's spend-guard hook. The hook's message names the tool and what it spends or changes.
+Reads never ask, except two that use a daily workspace allowance: a browser check of a Squid design (`check_component`) and ranking the template library (`match_templates`). Publish, deploy, delete, and anything that generates, renders or runs in a sandbox ask first, in the conversation and again through the plugin's spend-guard hook. The hook's message names the tool and what it spends or changes. Drafts (a brand page draft, a design draft) do not ask.
+
+In auto, bypassPermissions and dontAsk modes no prompt can appear, so the hook refuses a credit-spending call once and the model asks you in chat; the same call made again within 15 minutes goes through. Two environment switches change the plugin's behaviour: `SPARKLETREE_SPEND_GUARD=prompt-only` keeps the prompts but drops the refuse-once step, `SPARKLETREE_SPEND_GUARD=off` turns the hook off, and `SPARKLETREE_SESSION_CONTEXT=off` keeps the one routing line out of the model's context at session start.
 
 ## If something fails
 
