@@ -47,22 +47,24 @@ run() {
   check "duplicate asks" ask "$(pl default ${P}manage_campaigns '{"action":"duplicate","campaignId":"c"}')"
   check "share link asks" ask "$(pl default ${P}manage_campaigns '{"action":"create_share_link","campaignId":"c"}')"
   check "revoke share link asks" ask "$(pl default ${P}manage_campaigns '{"action":"revoke_share_link","campaignId":"c","tokenId":"t"}')"
-  check "check_component asks" ask "$(pl default ${P}query_campaigns '{"action":"check_component","componentId":"k"}')"
-  check "match_templates asks" ask "$(pl default ${C}query_campaigns '{"action":"match_templates","campaignId":"c"}')"
+  check "check_component asks" ask "$(pl default ${P}manage_campaigns '{"action":"check_component","componentId":"k"}')"
+  check "match_templates asks" ask "$(pl default ${C}manage_campaigns '{"action":"match_templates","campaignId":"c"}')"
+  check "query check_component passes (server refuses it)" pass "$(pl default ${P}query_campaigns '{"action":"check_component","componentId":"k"}')"
   check "query list passes" pass "$(pl default ${P}query_campaigns '{"action":"list","status":"active"}')"
   check "list_templates passes" pass "$(pl default ${P}query_campaigns '{"action":"list_templates","query":"bakery"}')"
   check "get_template passes" pass "$(pl default ${P}query_campaigns '{"action":"get_template","templateId":"001-a"}')"
   check "forecast passes" pass "$(pl default ${P}query_campaigns '{"action":"forecast","campaignId":"c"}')"
   check "query without action passes" pass "$(pl default ${P}query_campaigns '{}')"
   check "reviewer agent may read" pass "$(pl default ${P}query_campaigns '{"action":"get","campaignId":"c"}' ',"agent_type":"sparkletree:campaign-reviewer"')"
-  check "reviewer agent denied check" deny "$(pl default ${P}query_campaigns '{"action":"check_component","componentId":"k"}' ',"agent_type":"sparkletree:campaign-reviewer"')"
-  check "digest agent denied match" deny "$(pl default ${C}query_campaigns '{"action":"match_templates","campaignId":"c"}' ',"agent_type":"sparkletree:analytics-digest"')"
+  check "reviewer agent denied check" deny "$(pl default ${P}manage_campaigns '{"action":"check_component","componentId":"k"}' ',"agent_type":"sparkletree:campaign-reviewer"')"
+  check "digest agent denied match" deny "$(pl default ${C}manage_campaigns '{"action":"match_templates","campaignId":"c"}' ',"agent_type":"sparkletree:analytics-digest"')"
   check "reviewer agent denied" deny "$(pl default ${C}manage_campaigns '{"action":"update_variant"}' ',"agent_id":"a1","agent_type":"sparkletree:campaign-reviewer"')"
   check "digest agent denied upload" deny "$(pl default ${P}upload_asset '{"action":"from_url"}' ',"agent_type":"sparkletree:analytics-digest"')"
   check "auto: spend denied once" deny "$(pl auto ${P}generate_campaign '{"mode":"start","intent":{"a":1}}')"
   check "auto: same call passes" pass "$(pl auto ${P}generate_campaign '{"mode":"start","intent":{"a":1}}')"
   check "auto: live change defers" pass "$(pl auto ${P}manage_campaigns '{"action":"publish","campaignId":"c"}')"
-  check "auto: check_component passes" pass "$(pl bypassPermissions ${P}query_campaigns '{"action":"check_component","componentId":"k"}')"
+  check "auto: check_component passes" pass "$(pl bypassPermissions ${P}manage_campaigns '{"action":"check_component","componentId":"k"}')"
+  check "auto: match_templates passes" pass "$(pl auto ${C}manage_campaigns '{"action":"match_templates","campaignId":"c"}')"
   check "dontAsk: render spend denied once" deny "$(pl dontAsk ${P}render_video '{"mode":"squid","campaignId":"c","variantId":"v"}')"
   # job-watch marker then duplicate warning
   printf '%s' "$(pl default ${P}generate_campaign '{"mode":"start"}' ',"tool_response":{"content":[{"type":"text","text":"{\"campaignId\":\"c\"}"}]}')" | sed 's/PreToolUse/PostToolUse/' | sh scripts/job-watch.sh "$tmp"
@@ -81,8 +83,10 @@ case "$out" in *'"additionalContext":"SparkleTree plugin is installed'*) echo "o
 printf '%s' "$out" | { command -v jq >/dev/null && jq -e . >/dev/null && echo "ok   session output is JSON" || { echo "FAIL session output JSON"; fail=1; }; }
 # Every tool the guard handles must reach it through the PreToolUse matcher.
 m=$(sed -n 's/.*"matcher": "mcp__\.\*__(\([^)]*\))\$".*/\1/p' hooks/hooks.json | head -1)
-for t in generate_campaign render_video video_commission manage_campaigns manage_products manage_brand manage_surfaces upload_asset query_campaigns; do
+for t in generate_campaign render_video video_commission manage_campaigns manage_products manage_brand manage_surfaces upload_asset; do
   case "|$m|" in *"|$t|"*) ;; *) echo "FAIL PreToolUse matcher misses $t"; fail=1;; esac
 done
-[ $fail = 0 ] && echo "ok   PreToolUse matcher covers the guarded tools"
+# Reads never reach it: every query_* tool is a pure read.
+case "$m" in *query_*) echo "FAIL PreToolUse matcher names a query_* tool: $m"; fail=1;; esac
+[ $fail = 0 ] && echo "ok   PreToolUse matcher covers the guarded tools and no reads"
 exit $fail

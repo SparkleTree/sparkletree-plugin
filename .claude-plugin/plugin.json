@@ -1,7 +1,7 @@
 {
   "name": "sparkletree",
   "displayName": "SparkleTree",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Create, publish and measure SparkleTree campaigns from your AI: skills for the campaign craft, a read-only reviewer and digest agent, a spend guard, and the SparkleTree MCP server.",
   "author": {
     "name": "SparkleTree",

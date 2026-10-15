@@ -1,11 +1,14 @@
 #!/bin/sh
-# PreToolUse for SparkleTree write tools, plus two query_campaigns actions that
-# use workspace allowances (check_component, match_templates). POSIX sh; uses
-# jq when present and falls back to sed and awk. Keys on the tool-name suffix,
-# so the plugin-scoped name, a hand-added server and a claude.ai connector id
-# all behave the same.
+# PreToolUse for SparkleTree write tools. POSIX sh; uses jq when present and
+# falls back to sed and awk. Keys on the tool-name suffix, so the
+# plugin-scoped name, a hand-added server and a claude.ai connector id all
+# behave the same. No query_* tool reaches this hook: every one is a pure
+# read. The two actions that use a workspace allowance without changing
+# campaign data (check_component, match_templates) are manage_campaigns
+# actions.
 #
-# 1. Every other query_campaigns action passes silently, first.
+# 1. A query_* call that reaches the script anyway (a hand-written matcher)
+#    passes silently, first.
 # 2. Inside the read-only plugin agents (campaign-reviewer, analytics-digest)
 #    every call that reaches this point is denied. disallowedTools cannot name
 #    a connector's tools.
@@ -47,10 +50,8 @@ status=$(arg status | clean); publish=$(arg publish | clean)
 agent=$(top agent_type); pmode=$(top permission_mode | clean)
 session=$(top session_id | clean); [ -n "$session" ] || session=nosession
 
-# Reads pass, except the two that use a workspace allowance.
-if [ "$suffix" = query_campaigns ]; then
-  case "$action" in check_component|match_templates) ;; *) exit 0 ;; esac
-fi
+# Reads pass.
+case "$suffix" in query_*) exit 0 ;; esac
 
 out() { # decision reason
   reason=$(printf '%s' "$2" | sed 's/\\/\\\\/g; s/"/\\"/g')
@@ -100,6 +101,8 @@ case "$suffix" in
       apply_template) [ "$publish" = true ] && { level=live; msg="manage_campaigns action=apply_template publish=true puts the template live as a new variant (admin). Claim slots such as price or offer stay empty until they are filled."; } ;;
       publish_component) level=live; msg="manage_campaigns action=publish_component puts a custom Squid design live as a new variant." ;;
       revert_component) level=live; msg="manage_campaigns action=revert_component pauses the variants that carry the design." ;;
+      check_component) level=quota; msg="manage_campaigns action=check_component runs the static checks and, where browser checks are switched on, starts a browser check of the design in a sandbox (20 design checks per workspace per day). It changes no campaign data. A repeat call for the same design and slot values reads the stored check." ;;
+      match_templates) level=quota; msg="manage_campaigns action=match_templates may make a model call to rank the template library for this campaign's business (30 uncached matches per workspace per day; a match is kept for 7 days). It changes no campaign data." ;;
       delete) level=live; msg="manage_campaigns action=delete removes the campaign and its variants permanently." ;;
       delete_variant) level=live; msg="manage_campaigns action=delete_variant removes a variant permanently; update_variant with isActive=false is the reversible alternative." ;;
     esac ;;
@@ -114,11 +117,6 @@ case "$suffix" in
       revert_page) level=live; msg="manage_brand action=revert_page puts the default brand home page back live." ;;
       update_*) level=live; msg="manage_brand action=$action changes the brand every campaign, the brand page and the concierge use. Confirm the old and new values." ;;
       set_logo) level=live; msg="manage_brand action=set_logo replaces a logo that campaigns, the brand page and the concierge use. Confirm the slot and the image." ;;
-    esac ;;
-  query_campaigns)
-    case "$action" in
-      check_component) level=quota; msg="query_campaigns action=check_component runs the static checks and, where browser checks are switched on, starts a browser check of the design in a sandbox (20 design checks per workspace per day). A repeat call for the same design and slot values reads the stored check." ;;
-      match_templates) level=quota; msg="query_campaigns action=match_templates may make a model call to rank the template library for this campaign's business (30 uncached matches per workspace per day; a match is kept for 7 days)." ;;
     esac ;;
   manage_surfaces)
     level=live; msg="manage_surfaces operation=${operation:-?} creates a surface or zone (editor role, surface quota)." ;;

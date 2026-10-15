@@ -38,10 +38,10 @@ Never change what you have not read in this session. Before any `manage_*` call,
 
 ## Confirm before spend or live changes
 
-Tools with `readOnlyHint: true` spend no credits and change nothing. Two of their actions still use a daily workspace allowance and need a yes: `query_campaigns` `check_component` (a browser check in a sandbox, 20 per day) and `match_templates` (may make a model call, 30 per day). Everything below needs the user's explicit yes, every time, even if a similar run was approved earlier:
+Tools with `readOnlyHint: true` spend no credits and change nothing. Two `manage_campaigns` actions change no campaign data but use a daily workspace allowance and need a yes: `check_component` (a browser check in a sandbox, 20 per day) and `match_templates` (may make a model call, 30 per day). Everything below needs the user's explicit yes, every time, even if a similar run was approved earlier:
 
 - Credit spend, paid inference or video renders: `generate_campaign` (both modes; the credits for its AI images are set aside when it starts), `render_video` modes video, campaign and still (daily render limit), `video_commission` create, approve and revise (five a day, limited revision rounds), `manage_products` `import_from_url`, `manage_campaigns` `generate_playbook`.
-- Daily sandbox or model allowances: `render_video` `mode: squid`, `manage_brand` `render_check`, and the two `query_campaigns` actions above.
+- Daily sandbox or model allowances: `render_video` `mode: squid`, `manage_brand` `render_check`, and `manage_campaigns` `check_component` and `match_templates`.
 - Quota: `manage_products` create and imports, `manage_campaigns` `duplicate`, `manage_surfaces` `create_surface`.
 - Live changes and deletes: `manage_campaigns` publish, deploy, delete, delete_variant, update_deployment, `create_share_link`, `revoke_share_link`, `publish_component`, `revert_component`, `create_component` or `apply_template` with `publish: true`, and `update` to `status: "active"`; `update_variant` on a live campaign (saves republish immediately); `manage_brand` brand data writes (`update_*`, `set_logo`), `publish_page`, `revert_page`, `delete_page`, `delete_files`, and `create_page` or `edit_page` with `publish: true`; `manage_surfaces`; `manage_products` update and delete.
 
@@ -53,7 +53,7 @@ State the exact call, the target by name and id, and who pays (the workspace's m
 
 ## Async jobs
 
-`generate_campaign`, `render_video`, `video_commission` and product imports return before the work finishes. Poll every 10 to 30 seconds: `query_campaigns` `action: generation_status`, `query_video` `action: progress`, `query_video_commissions` `action: get`, `query_products` `action: import_status`. If the host negotiated the tasks extension, `tasks/get` on the returned `taskId` works too. Never re-issue a start call because a poll said "still running"; that starts a second paid job. Design and render checks also finish later: call `query_campaigns` `check_component` again for the same design (a repeat returns the stored check, it starts no new one), and read a brand page render check with `query_brand` `check_page`.
+`generate_campaign`, `render_video`, `video_commission` and product imports return before the work finishes. Poll every 10 to 30 seconds: `query_campaigns` `action: generation_status`, `query_video` `action: progress`, `query_video_commissions` `action: get`, `query_products` `action: import_status`. If the host negotiated the tasks extension, `tasks/get` on the returned `taskId` works too. Never re-issue a start call because a poll said "still running"; that starts a second paid job. Design and render checks also finish later: call `manage_campaigns` `check_component` again for the same design (a repeat returns the stored check, it starts no new one), and read a brand page render check with `query_brand` `check_page`.
 
 ## Pagination and lean responses
 

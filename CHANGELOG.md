@@ -2,6 +2,12 @@
 
 Any change to a tool schema on the server bumps the plugin version, gets a note here for the OpenAI re-review, and is batched into a Cursor release.
 
+## 0.2.1
+
+- Follows the final registry 1.0.3 server surface; `server.json` stays at 1.0.3. `check_component` and `match_templates` are now `manage_campaigns` actions, so `query_campaigns` carries only pure reads (`list_templates`, `get_template`, `get_component`, `forecast` and the rest). Their inputs, outputs, roles and limits are unchanged, and both still change no campaign data. Sending either to `query_campaigns` returns `invalid_input` naming `manage_campaigns`.
+- Skills (`sparkletree`, its tool reference, `squid-design`), README "What the plugin runs" and "Who pays for what", SETUP, AGENTS.md and the `squid-design` and `squid-templates` eval graders name the new home.
+- Hooks: the spend guard asks before `manage_campaigns` `check_component` and `match_templates` (daily allowance), and denies them inside the read-only `campaign-reviewer` and `analytics-digest` agents, which already list `manage_campaigns` in `disallowedTools`. `query_campaigns` is no longer in the PreToolUse matcher; a `query_*` call that reaches the script anyway passes silently. `scripts/test-hooks.sh` checks that the matcher names every guarded tool and no `query_*` tool.
+
 ## 0.2.0
 
 - CI: every push to `main` rebuilds the `directory` branch for Anthropic's directory. It is `main` with `.mcp.json` on `https://app.sparkletree.io/api/mcp/directory` (15 tools, no AI images, no AI video commissions) and those tools removed from the skills, agents, hooks, README and evals (`scripts/directory-transform.sh`, `scripts/ci-directory-branch.sh`).
