@@ -41,4 +41,4 @@ Chips are shared across the campaign, up to six. Spend them on questions custome
 
 End the plan with the cost line and a question, for example:
 
-"This runs one generation (credits from the workspace pool) and creates the campaign in review, unpublished. Go ahead?"
+"This runs one generation with three AI images (credits from the workspace pool, the image credits set aside at the start) and creates the campaign in review, unpublished. Go ahead?"

@@ -1,13 +1,13 @@
 ---
 name: brand
-description: SparkleTree brand book, voice and brand page. Set up or refresh logo, colours, fonts, tone, dos and donts, messaging and the concierge answers from a website or documents, and author or revert the brand home page. Use for import our brand, tone of voice, brand colours, brand guidelines, concierge, brand page, or onboarding a new SparkleTree workspace.
+description: SparkleTree brand book, voice and brand page. Set up or refresh logo, colours, fonts, tone, dos and donts, messaging and the concierge answers from a website or documents, and author, edit, check, publish or revert the brand home page or a multi-page brand site. Use for import our brand, tone of voice, brand colours, brand guidelines, concierge, brand page, brand site, or onboarding a new SparkleTree workspace.
 ---
 
 # Brand book, voice and brand page
 
 The brand book is what every generated variant, Squid and page inherits. Get it right once and generation stays on voice; leave it empty and every campaign starts from nothing.
 
-Brand writes need the admin role (a workspace API key counts as a member and cannot make them). The one exception is a brand home page draft, which a member can store. The plan matters too: a workspace without an active plan cannot change brand data, a Starter workspace that holds a verified address cannot either, and brand home page actions need a plan that includes publishing a brand page. The `forbidden` answer says which. Check with `get_platform_info` `topic: "organization"`; if the user is not an admin, prepare the content and hand it over instead of calling `manage_brand`.
+Brand data writes (brand book, profile, voice, concierge, logo) need the admin role (a workspace API key counts as a member and cannot make them). Brand page drafts are the exception: a member can create, edit and check a draft and add files to it; publishing, reverting and deleting need an admin. The plan matters too: a workspace without an active plan cannot change brand data, a Starter workspace that holds a verified address cannot either, and every brand page action needs a plan that includes publishing a brand page. The `forbidden` answer says which. Check with `get_platform_info` `topic: "organization"`; if the user is not an admin, prepare the content and hand it over instead of calling `manage_brand`.
 
 ## 1. Read what exists
 
@@ -53,10 +53,24 @@ Edge caches invalidate in the same call. Published campaign pages bake visuals a
 
 ## 6. The brand home page, if the user wants it authored
 
-The brand host (`<slug>.sparkletree.io` or the custom domain) renders a default home page from the brand book. An agent can replace it with one hand-authored HTML document. Only do this when the user asks for it; the default render is fine for most workspaces.
+The brand host (`<slug>.sparkletree.io` or the custom domain) renders a default home page from the brand book. An agent can replace it with a hand-authored page, or a small site of several pages with its own CSS, scripts and images. Only do this when the user asks for it; the default render is fine for most workspaces.
 
-1. `query_brand` `action: get_page`: the live state, every stored version with its preview URL, and the agent guide. The same guide is the resource `mosaic://brand-page-guide`. Read it before writing: it carries the palette, the live campaign ids, the relative embed and link paths the edge serves, and the rules.
+`manage_brand` is marked destructive, so some hosts ask before every call, drafts included. Say so once if the user wonders why.
+
+1. `query_brand` `action: get_page`: the live state, the newest 20 stored versions with their preview URLs, and the agent guide. The same guide is the resource `mosaic://brand-page-guide`. Read it before writing: it carries the palette, the live campaign ids, the relative embed and link paths the edge serves, and the rules.
 2. Write one complete, self-contained HTML document (doctype to closing html tag, 1 MiB at most). Use only the paths the guide names for campaign embeds and links; nothing external that the page cannot live without.
-3. `manage_brand` `action: create_page` with `html` and a short `notes` line. Without `publish` it stores a draft and returns a signed preview URL on the real host; the member role is enough for a draft. Show the user the preview URL and wait.
-4. On yes, `manage_brand` `action: publish_page` with the `pageId` from the draft (or `create_page` with `publish: true` when the user has already approved the HTML). Admin role. The edge is invalidated in the same call and the response carries the live URL.
-5. `manage_brand` `action: revert_page` puts the default render back. Stored versions stay listed under `get_page` and can be published again.
+3. `manage_brand` `action: create_page` with `html` and a short `notes` line. Without `publish` it stores a draft and returns a signed preview URL on the real host, the check result and the `sha256`; the member role is enough for a draft. Show the user the preview URL and wait.
+4. Small fixes: do not resend the whole page. `query_brand` `action: get_page` with `pageId` returns the version's HTML and `sha256` (`lines: {from, to}` reads a long page in parts, `path` reads another text file of the version). Then `manage_brand` `action: edit_page` with `pageId`, `edits` (exact `old` text and its `new` text, up to 50, applied in order) and `expectedSha256`. If any edit does not match, nothing is saved and the error names it. A published version is kept and the edit becomes a new draft.
+5. Check: `query_brand` `action: check_page` with `pageId` checks every file against the guide's rules. Blocking findings stop a publish; fix them with `edit_page`. For a render in a real browser, `manage_brand` `action: render_check` with `pageId` loads every page (8 at most) at phone and desktop size in a sandbox and reports errors, failed requests, layout shift, overflow, blank renders and slow loads with screenshots. It changes nothing, counts against 20 render checks per workspace per day, and takes a while; ask first, then read the result with `check_page`. Its findings are warnings, not a publish gate.
+6. On yes, `manage_brand` `action: publish_page` with the `pageId` (or `create_page` or `edit_page` with `publish: true` when the user has already approved the result). Admin role. The edge is invalidated in the same call and the response carries the live URL.
+7. `manage_brand` `action: revert_page` puts the default render back. Stored versions stay listed under `get_page` and can be published again. `action: delete_page` with `pageId` permanently deletes a version that is not live, such as an abandoned draft (admin; confirm first).
+
+### More than one page
+
+A version can hold more files than `index.html`: other pages (`events/index.html`), CSS, scripts, fonts and images.
+
+1. `manage_brand` `action: create_version` (optional `basePageId`, default the published version) makes a draft copy with all its files.
+2. `query_brand` `action: get_site` with `pageId` lists the files with their sizes and `sha256`.
+3. `manage_brand` `action: put_files` with `pageId` and up to 20 `files` per call: `{path, content}` for text (HTML pages always this way), `contentBase64` for a binary file up to 1 MiB, `assetId` for an image or video already uploaded with `upload_asset`, or `siteAssetId` for a larger file (10 MiB at most): get it from `manage_brand` `action: create_file_upload` with `path` and `bytes`, then PUT the file to the returned `uploadUrl` with the headers given. A version holds 200 files and 25 MiB.
+4. `manage_brand` `action: delete_files` with `pageId` and `paths` removes files from the draft (confirm first; `index.html` stays).
+5. Check and publish as in steps 5 and 6. Only a draft can change; for a published version, make a new draft with `create_version` first.

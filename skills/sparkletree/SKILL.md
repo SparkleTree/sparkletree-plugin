@@ -5,7 +5,7 @@ description: SparkleTree rules for any request that touches a SparkleTree worksp
 
 # SparkleTree orientation
 
-SparkleTree is a marketing platform. A campaign holds variants (the creatives). The creative unit is the Squid, a conversational ad with a kicker, headline, body, CTA and chips; a Squid can also carry a custom HTML design. Campaigns deploy to surfaces (websites, the brand page, screens, kiosks, QR codes). Adaptive CVG learns which variant performs and shows it more often. Analytics report Impressions (raw deliveries) and Reach (distinct sessions) separately.
+SparkleTree builds, manages and promotes a business online and on screens: brand, website, SEO and AI visibility, and campaigns, from one connected system. Over this connection you work with the parts below. A campaign holds variants (the creatives). The creative unit is the Squid, a conversational ad with a kicker, headline, body, CTA and chips; a Squid can also carry a custom HTML design or a ready-made template. Campaigns deploy to surfaces (websites, the brand page, screens, kiosks, QR codes). Adaptive CVG learns which variant performs and shows it more often. Analytics report Impressions and Reach separately: headline Impressions include Meta Ads deliveries at day granularity and up, Reach is distinct SparkleTree sessions.
 
 The MCP server is `https://app.sparkletree.io/api/mcp`. Every tool runs as the signed-in user, in one workspace, with that user's role. A connection cannot reach another workspace.
 
@@ -15,8 +15,8 @@ The MCP server is `https://app.sparkletree.io/api/mcp`. Every tool runs as the s
 |---|---|
 | A new campaign from a product link or a goal | `launch-campaign` |
 | Products, product photos, uploading a file, a CSV import | `products` |
-| The brand book, voice, colours, concierge answers, the brand home page | `brand` |
-| A custom Squid design (their own HTML look), or a video of a design | `squid-design` |
+| The brand book, voice, colours, concierge answers, the brand home page or a multi-page brand site | `brand` |
+| A custom Squid design (their own HTML look), a ready-made template, a design check, or a video of a design | `squid-design` |
 | Critique or compare variants, check copy is on brand | `review-variants` |
 | Numbers: how campaigns did, which variant wins, a weekly report | `analytics` |
 | What is live or running right now | `status` |
@@ -38,19 +38,22 @@ Never change what you have not read in this session. Before any `manage_*` call,
 
 ## Confirm before spend or live changes
 
-Tools with `readOnlyHint: true` are free. Everything else needs the user's explicit yes, every time, even if a similar run was approved earlier:
+Tools with `readOnlyHint: true` spend no credits and change nothing. Two of their actions still use a daily workspace allowance and need a yes: `query_campaigns` `check_component` (a browser check in a sandbox, 20 per day) and `match_templates` (may make a model call, 30 per day). Everything below needs the user's explicit yes, every time, even if a similar run was approved earlier:
 
-- Credit spend or paid inference: `generate_campaign` (both modes), `render_video` (all modes), `video_commission` create, approve and revise, `manage_products` `import_from_url`, `manage_campaigns` `generate_playbook`.
+- Credit spend or paid inference: `generate_campaign` (both modes; the credits for its AI images are set aside when it starts), `render_video` modes video, campaign and still, `video_commission` create, approve and revise, `manage_products` `import_from_url`, `manage_campaigns` `generate_playbook`.
+- Daily sandbox or model allowances: `render_video` `mode: squid`, `manage_brand` `render_check`, and the two `query_campaigns` actions above.
 - Quota: `manage_products` create and imports, `manage_campaigns` `duplicate`, `manage_surfaces` `create_surface`.
-- Live changes: `manage_campaigns` publish, deploy, delete, delete_variant, update_deployment, `publish_component`, `revert_component`, and `update` to `status: "active"`; `update_variant` on a live campaign (saves republish immediately); `manage_brand` (all actions); `manage_surfaces`; `manage_products` update and delete.
+- Live changes and deletes: `manage_campaigns` publish, deploy, delete, delete_variant, update_deployment, `create_share_link`, `revoke_share_link`, `publish_component`, `revert_component`, `create_component` or `apply_template` with `publish: true`, and `update` to `status: "active"`; `update_variant` on a live campaign (saves republish immediately); `manage_brand` brand data writes (`update_*`, `set_logo`), `publish_page`, `revert_page`, `delete_page`, `delete_files`, and `create_page` or `edit_page` with `publish: true`; `manage_surfaces`; `manage_products` update and delete.
 
-State the exact call, the target by name and id, and who pays (the workspace's monthly credit pool). Then wait. This plugin ships a hook that stops before the spend and live-change tools; the hook is a backstop, not a substitute for asking.
+Drafts need no extra yes beyond the user's request: `manage_brand` `create_page` and `edit_page` without `publish`, `create_version`, `put_files`, `create_file_upload`, and `manage_campaigns` `create_component` and `apply_template` without `publish`. Show the preview URL afterwards.
+
+State the exact call, the target by name and id, and who pays (the workspace's monthly credit pool or the daily allowance). Then wait. This plugin ships a hook that asks before every call in the lists above except `update_variant` (the hook cannot see whether the campaign is live) and `manage_products` `create`, `update` and `import_csv`; confirm those in chat. The hook is a backstop, not a substitute for asking. `manage_brand` is annotated destructive, so some hosts also ask before every `manage_brand` call, drafts included.
 
 `upload_asset` only stores a file in the workspace (`from_url`, `from_data`, or `create_upload` then `complete_upload` for a local or large file). It needs no confirmation beyond the user having asked for the file to be used. `query_assets` lists what is already stored, so check it before uploading the same file again.
 
 ## Async jobs
 
-`generate_campaign`, `render_video`, `video_commission` and product imports return before the work finishes. Poll every 10 to 30 seconds: `query_campaigns` `action: generation_status`, `query_video` `action: progress`, `query_video_commissions` `action: get`, `query_products` `action: import_status`. If the host negotiated the tasks extension, `tasks/get` on the returned `taskId` works too. Never re-issue a start call because a poll said "still running"; that starts a second paid job.
+`generate_campaign`, `render_video`, `video_commission` and product imports return before the work finishes. Poll every 10 to 30 seconds: `query_campaigns` `action: generation_status`, `query_video` `action: progress`, `query_video_commissions` `action: get`, `query_products` `action: import_status`. If the host negotiated the tasks extension, `tasks/get` on the returned `taskId` works too. Never re-issue a start call because a poll said "still running"; that starts a second paid job. Design and render checks also finish later: call `query_campaigns` `check_component` again for the same design (a repeat returns the stored check, it starts no new one), and read a brand page render check with `query_brand` `check_page`.
 
 ## Pagination and lean responses
 
@@ -63,10 +66,10 @@ Every error is `{error: {code, message, remedy, details}}`. Read the remedy befo
 | Code | Meaning | Do |
 |---|---|---|
 | `invalid_input` | Wrong action or fields; `details.replacement` names a moved read action | Fix the call |
-| `precondition_failed` | Quota, credits, a daily cap, a state rule, or a question for the user (`details.code: PRODUCT_EXISTS`) | Read `details.code`; ask the user when the remedy says so; never retry blindly |
+| `precondition_failed` | Quota, credits (including too few image credits for a campaign, with `details.creditsNeeded` and `creditsRemaining`), a daily cap, a state rule, or a question for the user (`details.code: PRODUCT_EXISTS`) | Read `details` and the remedy; ask the user when the remedy says so; never retry blindly |
 | `forbidden` | The role or plan does not allow it | Tell the user who can do it |
 | `entitlement_required` | A plan feature (`details.feature`) | Tell the user; do not retry |
-| `not_configured` | The feature is switched off on this deployment | Say it is not available yet; not a bug |
+| `not_configured` | The feature is switched off on this deployment (for example the Squid template library) | Say it is not available yet and offer the alternative; not a bug, do not retry |
 | `upstream_error` | A site, store or render service failed | Retry once later; for imports read `details.reason` |
 | `analytics_window_too_large` | Range too long for the granularity | Narrow the range or coarsen the granularity |
 

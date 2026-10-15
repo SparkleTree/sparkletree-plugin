@@ -26,7 +26,7 @@ Before any final render, show the user a still: `render_video` `mode: still` wit
 State the mode, the campaign or template, the aspect, the quality and that it spends workspace credits. On yes:
 
 - `render_video` `mode: campaign` with `campaignId`, optional `variantId` (one variant, otherwise up to four active variants), `aspect` (16:9 default, 9:16, 1:1), `quality` (draft or final). Returns one `campaignVideoRenderId` per variant.
-- A variant that runs a custom Squid design is recorded with `mode: squid` instead; see `skills/squid-design` section 6.
+- A variant that runs a custom Squid design is recorded with `mode: squid` instead; see `skills/squid-design` section 8.
 - `render_video` `mode: video` with `templateId`, `props`, `quality`, optional `fileName`. Returns `renderId` and `bucketName`.
 
 ## 5. Poll and report

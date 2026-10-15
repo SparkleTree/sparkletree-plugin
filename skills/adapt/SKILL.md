@@ -20,7 +20,7 @@ Map the sentence to exactly one write and read its current state first:
 | Which variant runs | `query_campaigns` `action: variants` | `manage_campaigns` `action: update_variant` with `isActive` |
 | Brand page answers, chips, facts, FAQ | `query_brand` `action: get` | `manage_brand` `action: update_concierge` |
 | Brand voice, tagline, dos and donts | `query_brand` `action: get` | `manage_brand` `action: update_voice` or `update_brandbook` |
-| The brand home page itself (an agent-authored page) | `query_brand` `action: get_page` | `manage_brand` `action: create_page` as a draft, then `publish_page` on approval; `revert_page` restores the default. See `skills/brand` section 6. |
+| The brand home page itself (an agent-authored page) | `query_brand` `action: get_page` with `pageId` (the HTML and its `sha256`) | `manage_brand` `action: edit_page` with exact-text `edits` and `expectedSha256` (a draft), then `publish_page` on approval; `create_page` only for a new page; `revert_page` restores the default. See `skills/brand` section 6. |
 
 Name the campaign or brand subtree by name and id and echo it back. Brand writes need the admin role; if the user is not an admin, prepare the text and hand it over instead. Never target `generate_campaign`, `render_video`, `video_commission`, `manage_products` `import_from_url` or `manage_campaigns` `generate_playbook` from this skill: they spend credits and a scheduled run cannot answer the spend hook.
 

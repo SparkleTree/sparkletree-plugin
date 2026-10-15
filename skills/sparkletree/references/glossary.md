@@ -5,6 +5,7 @@
 - Variant: one creative inside a campaign. Adaptive CVG picks among active variants.
 - Squid: the conversational ad a campaign renders. Parts: kicker, headline, body, CTA pill, up to six chips, chat.
 - Design: a custom HTML look for a Squid, authored by an agent or a person, with a manifest of slots (headline, CTA, custom text, lists, images). Publishing a design adds a new variant, so Adaptive CVG tests it against the others.
+- Template: a ready-made design from the Squid template library. Applying one stores it as the campaign's design, baked with the brand book; claim slots such as price or offer stay empty until filled with real facts.
 - Slots: the named fields a design fills; custom slot values live in the variant's `contentStructure.squidSlots`.
 - Chips: suggested questions under the chat. Spend them on questions customers actually ask.
 - Adaptive CVG: the selection engine that shows the winning variant more often once it has evidence. Needs traffic before it can learn.
@@ -17,9 +18,11 @@
 - Gallery: up to five images per product; the first is the primary image.
 - Brand book: visual identity (logo, colors, fonts, imagery) and voice guidelines (tone, personality, dos, donts, messaging rules).
 - Concierge: the brand's `/ask` assistant, configured through `manage_brand` `update_concierge` (chips, facts, FAQ, policies).
-- Impressions: raw delivery count, one per load. Reloads inflate it.
-- Reach: distinct sessions that saw the campaign. Per tab, cleared on close.
+- Impressions: delivery count, one per load. Reloads inflate it. In `query_analytics` at day granularity and up, the headline figure includes Meta Ads impressions; `channels` splits SparkleTree and Meta.
+- Reach: distinct SparkleTree sessions that saw the campaign. Per tab, cleared on close. Meta reach is reported separately and never added.
 - CTR (sessions): clicks over sessions reached. The number to compare creatives on.
-- Credits: the workspace's monthly pool for AI generation and rendering. Blocked actions return `precondition_failed`; published campaigns keep serving.
+- Credits: the workspace's monthly pool for AI generation, AI images and rendering. Blocked actions return `precondition_failed`; published campaigns keep serving.
+- Sandbox allowance: the daily count for work that runs in a sandbox browser: design checks, brand page render checks and Squid design videos, 20 each per workspace per day.
+- Brand site: a brand page version with more files than `index.html` (more pages, CSS, scripts, images).
 - Profile: the set of tools a connection sees. Selected by a call code, not a name. Visibility only, never permission.
 - Call code: the operator-issued secret appended as `?profile=<code>`.

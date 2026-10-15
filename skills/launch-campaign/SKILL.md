@@ -21,13 +21,13 @@ Write the campaign plan before touching `generate_campaign`. Show it and wait fo
 3. Audience and context: who, where, when. Only constraints that are true; leave the rest out.
 4. Variants: how many and how they differ. Variants should diverge on angle (price, occasion, feeling, proof), not on wording of the same angle. Two to four is normal.
 5. Brand constraints: pull tone and rules from `query_brand` `action: get`; note anything the user adds.
-6. What it costs: one generation run from the workspace's credit pool, plus the product import if one happened.
+6. What it costs: one generation run from the workspace's credit pool, including credits for each AI image (set aside when generation starts), plus the product import if one happened.
 
 ## 3. Generate
 
-On approval, `generate_campaign` `mode: start` with the intent shaped as in `skills/sparkletree/references/tools.md`. Pass `options.variantCount` and `options.brandGuidelines` from the plan. Then poll `query_campaigns` `action: generation_status` every 10 to 20 seconds until it completes or fails. Do not restart on "still running".
+On approval, `generate_campaign` `mode: start` with the intent shaped as in `skills/sparkletree/references/tools.md`. Pass `options.variantCount` and `options.brandGuidelines` from the plan. The credits for the campaign's AI images are set aside when the call is accepted. If the workspace has too few, nothing starts and the answer is `precondition_failed` naming the images, the credits needed and the credits left: tell the user and offer to generate without images (`options.includeImages: false`), to wait for credits to renew, or to ask the workspace admin. Then poll `query_campaigns` `action: generation_status` every 10 to 20 seconds until it completes or fails. Do not restart on "still running".
 
-If generation fails, read the error remedy. `mode: regenerate` from the failing `fromStep` is the fix for a partial run; it costs credits again, so confirm.
+If generation fails, read the error remedy. `mode: regenerate` from the failing `fromStep` is the fix for a partial run; it costs credits again and checks the image credits the same way, so confirm.
 
 ## 4. Review
 
@@ -51,4 +51,4 @@ Return: campaign name and id, variant count, the surface, and the live URL. The 
 
 ## Stop conditions
 
-Stop and ask instead of guessing when: no product resolves; the objective is ambiguous between two of the four; the workspace returns `precondition_failed` for quota or credits (read `details.code`); the user has not approved the plan.
+Stop and ask instead of guessing when: no product resolves; the objective is ambiguous between two of the four; the workspace returns `precondition_failed` for quota or credits (read `details` and the remedy); the user has not approved the plan.

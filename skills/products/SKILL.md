@@ -15,7 +15,7 @@ Read first: `query_products` `action: list` with `search` to see what exists, an
 |---|---|---|
 | A product page URL | `manage_products` `action: import_from_url` with `websiteUrl` | Paid inference and the open web; confirm first. Read the result back (name, price, description, image) |
 | The details in chat | `manage_products` `action: create` with `name` and what they gave you (`description`, `price`, `currency`, `sku`, `websiteUrl`, `category`, `tags`) | Product quota |
-| A spreadsheet or feed | `manage_products` `action: import_csv` with `csvContent` (2 MB max) or `csvUrl`; poll `query_products` `action: import_status` with the `jobId` | Product quota per new row |
+| A spreadsheet or feed | `manage_products` `action: import_csv` with `csvContent` (2 MB max) or `csvUrl`; poll `query_products` `action: import_status` with the `jobId`. Each row's `image_url` is downloaded and stored in the workspace; a row whose image fails is still written without it, and `warnings[]` says why | Product quota per new row |
 
 Never invent a price. If the page shows none, leave it empty; `update` with `price: null` clears a wrong one.
 
