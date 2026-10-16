@@ -41,7 +41,7 @@ Details, props, Next.js App Router notes and CSP lines: `references/sdk-react.md
 
 ## Site activity: record what visitors do
 
-Impressions and clicks on campaign creative are recorded by the script tag and the SDK components, and brand page views by the edge. The site's own buttons, links and searches reach Dashboard > Analytics > Site activity only when the site sends them with the SDK's `track`: a `campaignId` of the workspace, `"click"` or `"custom"`, and every detail inside `context` with `context.kind` as the event's name. Ask the user which actions they want to see and wire them while building. Snippets, naming rules and how to check: `references/site-activity.md`.
+Impressions and clicks on campaign creative are recorded by the script tag and the SDK components, and brand page views by the edge. The site's own buttons, links and searches reach Dashboard > Analytics > Site activity only when the site sends them with the SDK's `track`: a `campaignId` of the workspace, `"click"` or `"custom"`, and every detail inside `context` with `context.kind` as the event's name. Ask the user which actions they want to see and wire them while building. Snippets, naming rules and how to read them back with `query_analytics` `siteActivity`: `references/site-activity.md`.
 
 ## Create a surface and deploy
 

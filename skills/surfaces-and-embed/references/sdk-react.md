@@ -58,4 +58,4 @@ To the SparkleTree API only: time of day, weekday, timezone, language, coarse de
 1. Degrade: unreachable `apiBase`, fallback visible, `phase: "failed"`, `rewrites: 0`, no `data-content-source="generated"`.
 2. Happy path: real key, registered origin, the copy changes once, `data-content-source` present.
 3. Analytics: `query_analytics` `action: snapshot` on the campaign shows impressions after a visit.
-4. Site activity: the site's own actions (bookings, searches, taps on its own links) are not recorded by the components. Send them with `track` from `@sparkletree/core` as `references/site-activity.md` shows, and check them in Dashboard > Analytics > Site activity.
+4. Site activity: the site's own actions (bookings, searches, taps on its own links) are not recorded by the components. Send them with `track` from `@sparkletree/core` as `references/site-activity.md` shows, and read them back with `query_analytics` `sections: ["siteActivity"]`.

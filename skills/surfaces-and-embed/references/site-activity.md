@@ -51,4 +51,10 @@ record("custom", { kind: "search", q: query, results: matches.length });
 
 ## Checking it
 
-`query_analytics` does not return Site activity yet. After a test visit, tell the user to open Dashboard > Analytics > Site activity, where the event appears within a few minutes with the kinds and breakdowns you sent. In the browser, each event is one `POST /api/embed/v1/track` that answers 202.
+In the browser, each event is one `POST /api/embed/v1/track` that answers 202. After a test visit, read the events back (they appear within a few minutes):
+
+- `query_analytics` `action: snapshot` with `startDate`, `endDate` and `sections: ["siteActivity"]`. `siteActivity.kinds` lists each kind with its `key` (`source:eventType:name`, for example `sdk:custom:search`), `label`, `source` (`sdk`, `brand_page` or `embed`), `site`, `count`, `sessions`, `properties` and `zeroResultCount` (searches that found nothing). `siteActivity.pages` lists brand page views by path.
+- `siteActivityBreakdown: {kind, property, limit?}` lists one property of one kind value by value, for example `{kind: "sdk:custom:search", property: "q"}` for the search terms.
+- The section covers whole UTC days and the whole workspace. With `campaignIds`, `productIds`, `storeIds` or `eventTypes` it answers `available: false`, so ask for it without those filters.
+
+The user sees the same figures in Dashboard > Analytics > Site activity.

@@ -4,8 +4,9 @@ Any change to a tool schema on the server bumps the plugin version, gets a note 
 
 ## 0.2.2
 
+- Registry `server.json` 1.0.4: `query_analytics` `snapshot` gains the `siteActivity` section (the dashboard's Site activity panel: event kinds with key, label, source, site, count, sessions, properties and zeroResultCount; brand page views by path and by traffic source) and the `siteActivityBreakdown: {kind, property, limit?}` input for one property's values. Whole UTC days, up to 366 days back; unavailable with `campaignIds`, `productIds`, `storeIds` or `eventTypes`. Monorepo !1464, which sets `MCP_SERVER_VERSION` 1.0.4; merge this first, then rerun its `mcp-version-sync` job.
 - Site activity. Skills now say how a site the agent builds gets into Dashboard > Analytics > Site activity. New `surfaces-and-embed/references/site-activity.md`: what is recorded without code (brand page views per path; impressions and clicks on campaign creative), and how to send the site's own actions with the SDK's `track` (`SparkleTree.track` from `/api/embed/v1/sdk/core.js` on a brand page, `track` from `@sparkletree/core` elsewhere): a campaign id of the workspace, `"click"` or `"custom"`, every detail inside `context`, `context.kind` as the event's name, the naming rules for breakdowns, a `results` number for searches that found nothing, and no personal data.
-- `brand` asks which visitor actions the user wants to see and records them on the page as the agent guide's "Measure what visitors do" section shows (monorepo: same release as this note). `surfaces-and-embed`, its React reference, `analytics` and the tool reference point at Site activity and say that `query_analytics` does not return it yet. No tool or server change; `server.json` stays at 1.0.3.
+- `brand` asks which visitor actions the user wants to see and records them on the page as the agent guide's "Measure what visitors do" section shows (monorepo: same release as this note). `surfaces-and-embed`, its React reference, `analytics` and the tool reference point at Site activity and read it back with `query_analytics` `siteActivity`.
 
 ## 0.2.1
 
