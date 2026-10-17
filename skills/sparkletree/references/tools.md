@@ -1,6 +1,6 @@
 # The default tool surface
 
-Seventeen tools on the bare URL (`external_default`). Reads and writes never share a tool. Every tool takes one flat input with a discriminator (`action`, `mode`, `operation` or `topic`); the handler checks the fields for that action and answers `invalid_input` naming the bad ones. `organizationId` is optional everywhere and comes from the sign-in. Verified against the server source on 2026-10-15 (monorepo main 4be3e1bed, plus the final 1.0.3 change that moved `check_component` and `match_templates` to `manage_campaigns`), and the 1.0.4 `query_analytics` `siteActivity` section (monorepo !1464, 2026-10-16).
+Fifteen tools on the bare URL (`external_default`). Reads and writes never share a tool. Every tool takes one flat input with a discriminator (`action`, `mode`, `operation` or `topic`); the handler checks the fields for that action and answers `invalid_input` naming the bad ones. `organizationId` is optional everywhere and comes from the sign-in. Verified against the server source on 2026-10-15 (monorepo main 4be3e1bed, plus the final 1.0.3 change that moved `check_component` and `match_templates` to `manage_campaigns`), and the 1.0.4 `query_analytics` `siteActivity` section (monorepo !1464, 2026-10-16). Tool list checked again for server 1.0.5 (2026-10-17).
 
 | Tool | Read or write | Actions | Notes |
 |---|---|---|---|
@@ -19,8 +19,6 @@ Seventeen tools on the bare URL (`external_default`). Reads and writes never sha
 | `query_analytics` | read | `action: snapshot, export, ab_test, cvg_dashboard, insights` | `snapshot` needs `startDate`, `endDate`; `sections` default `["summary"]`, others timeseries, funnel, cohorts, abTests, insights, products, breakdowns, spend (plan gated; fails the whole call without it), video, live, creatives (`creativesLimit` 1 to 200, default 50), siteActivity (`siteActivityBreakdown: {kind, property, limit?}` for one property's values). `export` takes `includeCreatives`. Window caps: hourly 14 days, daily 366. See below |
 | `query_video` | read | `action: templates, progress, renders` | `templates` with `templateId` (logo-reveal, kinetic-promo, lightscribe) expands its props. `progress` takes one of: `campaignVideoRenderId`; `renderId` plus `bucketName`; `campaignId` plus `variantId` (Squid design exports) |
 | `render_video` | write, daily limit | `mode: video, campaign, still, squid` | `video`, `campaign` and `still` render within a daily per-workspace limit; `squid` is recorded in a sandbox. See below |
-| `query_video_commissions` | read | `action: list, get` | Poll `get` until `proof_ready` or `delivered` |
-| `video_commission` | write, daily limit | `action: create, approve, revise, cancel` | `create` takes `briefMd` (the description of the film), `aspects`, `targetDurationS` (max 30), optional `tier: marquee or atelier`. Five per workspace per day |
 
 ## manage_campaigns
 

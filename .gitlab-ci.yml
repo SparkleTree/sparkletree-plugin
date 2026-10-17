@@ -26,7 +26,6 @@ validate:
     - sh scripts/ci-check-bump.sh
     - sh scripts/test-ci-check-bump.sh
     - sh scripts/test-hooks.sh
-    - sh scripts/test-directory-transform.sh
 
 # The real plugin validator. Non-blocking until it has run green on main a few
 # times; then drop allow_failure.
@@ -55,25 +54,6 @@ tag-plugin:
     - apk add --no-cache git jq >/dev/null
     - VERSION=$(jq -r .version .claude-plugin/plugin.json)
     - sh scripts/ci-tag.sh "plugin-v$VERSION" "SparkleTree plugin $VERSION"
-
-# Rebuild the `directory` branch (the version Anthropic's directory lists) from
-# this main commit: main with .mcp.json and gemini-extension.json on
-# /api/mcp/directory and the AI video
-# commission and AI image material removed (scripts/directory-transform.sh).
-# Validates the generated tree with the plugin CLI, then pushes with the job
-# token (a job-token push starts no pipeline of its own).
-directory-branch:
-  stage: publish
-  image: node:22-alpine
-  needs:
-    - validate
-  rules:
-    - if: $CI_COMMIT_BRANCH == "main"
-  resource_group: directory-branch
-  script:
-    - apk add --no-cache git jq >/dev/null
-    - npm install -g @anthropic-ai/claude-code >/dev/null 2>&1
-    - sh scripts/ci-directory-branch.sh
 
 # Publish server.json to the official MCP registry when its version is ahead of
 # the registry, refuse when it is behind or reused, then tag server-v<version>.

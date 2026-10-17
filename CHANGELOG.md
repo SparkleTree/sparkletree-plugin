@@ -2,6 +2,13 @@
 
 Any change to a tool schema on the server bumps the plugin version, gets a note here for the OpenAI re-review, and is batched into a Cursor release.
 
+## 0.3.0
+
+- Registry `server.json` 1.0.5: the MCP server no longer has the video commission tools (`video_commission`, `query_video_commissions`). The default profile is now 15 tools. Renders with `render_video` (campaign, template, still and Squid design video) are unchanged, and so are campaign images. Monorepo merge request in progress, which sets `MCP_SERVER_VERSION` 1.0.5; merge it first, then rerun its `mcp-version-sync` job.
+- The plugin drops video commissions to match: the `video` skill, the orientation skill and its tool reference (15 tools) and glossary, `adapt`, the read-only agents' `disallowedTools`, the smoke eval runner, the spend guard and its PreToolUse matcher, the job watch and its PostToolUse matcher, `scripts/test-hooks.sh`, README, and AGENTS.md.
+- One server for everyone. Every install, Anthropic's plugin directory included, connects to `https://app.sparkletree.io/api/mcp`; there is no separate directory server.
+- The `directory` branch is no longer generated. The `directory-branch` CI job, `scripts/ci-directory-branch.sh`, `scripts/directory-transform.sh` and `scripts/test-directory-transform.sh` are gone, and `scripts/ci-validate.sh` and `scripts/ci-check-bump.sh` no longer special-case it. The existing remote branch is left as it is. Anthropic's listing uses `main`. Tagging and the registry publish are unchanged.
+
 ## 0.2.2
 
 - Registry `server.json` 1.0.4: `query_analytics` `snapshot` gains the `siteActivity` section (the dashboard's Site activity panel: event kinds with key, label, source, site, count, sessions, properties and zeroResultCount; brand page views by path and by traffic source) and the `siteActivityBreakdown: {kind, property, limit?}` input for one property's values. Whole UTC days, up to 366 days back; unavailable with `campaignIds`, `productIds`, `storeIds` or `eventTypes`. Monorepo !1464, which sets `MCP_SERVER_VERSION` 1.0.4; merge this first, then rerun its `mcp-version-sync` job.

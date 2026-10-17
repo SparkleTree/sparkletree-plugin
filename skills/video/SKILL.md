@@ -1,11 +1,11 @@
 ---
 name: video
-description: SparkleTree video. Render a short video or still from a campaign or a template with render_video, check for an existing render first, or commission a bespoke brand film with video_commission. Use for video, render, clip, reel, film, or a video of my best campaign. For a video of a custom Squid design, use squid-design.
+description: SparkleTree video. Render a short video or still from a campaign or a template with render_video, or check for an existing render first. Use for video, render, clip, reel, or a video of my best campaign. For a video of a custom Squid design, use squid-design.
 ---
 
 # Video
 
-Two tools, two price classes. `render_video` renders a template; a still or a draft is cheap, a final render is the expensive end; all count against a daily per-workspace limit. Ad hoc template renders are capped at 50 per workspace per day. `video_commission` queues an agent-authored brand film with proofs and revision rounds; five per workspace per day, each with a fixed number of revision rounds; it is the expensive path. Default to `render_video`; offer a commission only when the user asks for a bespoke film.
+`render_video` renders a template; a still or a draft is cheap, a final render is the expensive end; all count against a daily per-workspace limit. Ad hoc template renders are capped at 50 per workspace per day.
 
 ## 1. Pick the source
 
@@ -32,7 +32,3 @@ State the mode, the campaign or template, the aspect, the quality and that it co
 ## 5. Poll and report
 
 `query_video` `action: progress` with `campaignVideoRenderId`, or with `renderId` and `bucketName` for ad hoc renders. Progress is 0 to 1; done returns the download URL and size. Poll every 15 to 30 seconds; do not start a second render because the first is still running. Report the URL, duration, aspect and which variant it came from.
-
-## Commissioning a film
-
-Only on request. `video_commission` `action: create` with `briefMd`, the description of the film (goal, tone, what must appear, what must not), `aspects` (default 16:9), `targetDurationS` (up to 30), optional `soundtrackTrackRef`, `tier` (`marquee` fills a locked board scene, default; `atelier` writes free-form scene code from the description). Confirm the metered spend first. Poll `query_video_commissions` `action: get` until `proof_ready`, show `proof.stills` and `proof.draftMp4`, then either `action: approve` (queues the final render, spends again, ends at `delivered` with `finalMp4`) or `action: revise` with notes (each round is metered; check `round` against `maxRounds` before offering one). `action: cancel` stops a non-terminal commission. Over the daily cap the answer is `precondition_failed`; it resets at midnight UTC. Soundtracks: only audio the user holds rights to.

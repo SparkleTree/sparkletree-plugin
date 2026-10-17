@@ -49,7 +49,6 @@ run() {
   check "generate start asks" ask "$(pl default ${P}generate_campaign '{"mode":"start","intent":{"objective":"increase_sales"}}')"
   check "connector id asks too" ask "$(pl default ${C}generate_campaign '{"mode":"start"}')"
   check "still asks" ask "$(pl default ${P}render_video '{"mode":"still","templateId":"kinetic-promo"}')"
-  check "commission list passes" "$(x pass ask)" "$(pl default ${P}video_commission '{"action":"cancelx"}')"
   check "import_from_url asks" ask "$(pl default ${P}manage_products '{"action":"import_from_url","websiteUrl":"https://example.com"}')"
   check "product create passes" "$(x pass ask)" "$(pl default ${P}manage_products '{"action":"create","name":"Lamp"}')"
   check "update_variant passes" "$(x pass ask)" "$(pl default ${P}manage_campaigns '{"action":"update_variant","campaignId":"c","contentStructure":{"cta":{"action":"publish"}}}')"
@@ -181,7 +180,7 @@ out2=$(SPARKLETREE_HEALTH_URL=$down PATH=$tmp/bin-nojq "$SH" scripts/check-conne
 # Every tool the guard handles must reach it through the PreToolUse matcher.
 m=$(sed -n 's/.*"matcher": "mcp__\.\*__(\([^)]*\))\$".*/\1/p' hooks/hooks.json | head -1)
 mfail=0
-for t in generate_campaign render_video video_commission manage_campaigns manage_products manage_brand manage_surfaces upload_asset; do
+for t in generate_campaign render_video manage_campaigns manage_products manage_brand manage_surfaces upload_asset; do
   case "|$m|" in *"|$t|"*) ;; *) echo "FAIL PreToolUse matcher misses $t"; mfail=1;; esac
 done
 # Reads never reach it: every query_* tool is a pure read.

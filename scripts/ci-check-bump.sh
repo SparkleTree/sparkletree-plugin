@@ -10,9 +10,6 @@ set -eu
 cd "$(dirname "$0")/.."
 fail() { echo "FAIL: $*" >&2; exit 1; }
 
-# The directory branch is generated from main, which carries the bump check.
-if [ "${CI_COMMIT_BRANCH:-}" = directory ]; then echo "skip: directory is generated from main"; exit 0; fi
-
 base=${1:-}
 if [ -z "$base" ]; then
   if [ -n "${CI_COMMIT_BEFORE_SHA:-}" ] && [ "$CI_COMMIT_BEFORE_SHA" != "0000000000000000000000000000000000000000" ]; then
@@ -42,7 +39,7 @@ server_base=$(at_base server.json);               server_now=$(jq -r .version se
 # under scripts/ is excluded.
 changed=$(git diff --name-only "$base" -- skills agents hooks assets scripts \
   .mcp.json .claude-plugin .codex-plugin gemini-extension.json \
-  ':(exclude)scripts/ci-*.sh' ':(exclude)scripts/*directory-transform.sh' ':(exclude)scripts/bump-version.sh' ':(exclude)scripts/semver-cmp.sh' ':(exclude)scripts/build-openai-bundle.sh' ':(exclude)scripts/test-ci-check-bump.sh')
+  ':(exclude)scripts/ci-*.sh' ':(exclude)scripts/bump-version.sh' ':(exclude)scripts/semver-cmp.sh' ':(exclude)scripts/build-openai-bundle.sh' ':(exclude)scripts/test-ci-check-bump.sh')
 # A manifest whose only change is its version is the bump itself, not a change
 # that needs one.
 version_only() { # file

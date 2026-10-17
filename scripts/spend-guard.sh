@@ -146,13 +146,6 @@ case "$suffix" in
       squid) msg="render_video mode=squid records a variant's published Squid design as video in a sandbox (20 recordings per workspace per day; not on Starter). Confirm the variant and formats." ;;
       *) msg="render_video (mode=${mode:-video}) starts a render that counts against the workspace daily render limit. Iterate with mode=still or quality=draft before a final render." ;;
     esac ;;
-  video_commission)
-    case "$action" in
-      create) level=spend; msg="video_commission action=create queues a film commission (five per workspace per day, limited revision rounds). Confirm the description, aspect, duration and tier." ;;
-      approve) level=spend; msg="video_commission action=approve queues the final render of the film." ;;
-      revise) level=spend; msg="video_commission action=revise uses one of the limited revision rounds. Confirm the notes and that rounds remain." ;;
-      cancel) level=live; msg="video_commission action=cancel stops a commission; spent rounds are not refunded." ;;
-    esac ;;
   manage_products)
     case "$action" in
       import_from_url) level=spend; msg="manage_products action=import_from_url fetches the page and runs paid inference. Confirm the URL." ;;
@@ -195,9 +188,9 @@ esac
 [ "$level" = none ] && exit 0
 
 # A recent paid start from this session (job-watch.sh writes the marker).
-case "$suffix" in generate_campaign|render_video|video_commission)
+case "$suffix" in generate_campaign|render_video)
   m="$data/jobs/$session-$suffix"
-  if [ -f "$m" ] && [ "$action" != approve ] && [ "$action" != revise ] && [ "$action" != cancel ]; then
+  if [ -f "$m" ]; then
     then_s=$(tr -cd '0-9' < "$m" 2>/dev/null); now_s=$(date +%s)
     case "$then_s" in ''|*[!0-9]*) ;; *)
       mins=$(( (now_s - then_s) / 60 ))

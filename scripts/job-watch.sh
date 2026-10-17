@@ -1,8 +1,8 @@
 #!/bin/sh
 # PostToolUse for the SparkleTree tools that start paid async jobs
-# (generate_campaign, render_video, video_commission create). Records when this
-# session last started one, so spend-guard.sh can warn before a second start
-# while the first may still be running. No output; always exits 0.
+# (generate_campaign, render_video). Records when this session last started
+# one, so spend-guard.sh can warn before a second start while the first may
+# still be running. No output; always exits 0.
 input=$(cat | tr -d '\n')
 data=${1:-${CLAUDE_PLUGIN_DATA:-}}
 [ -n "$data" ] || data="${TMPDIR:-/tmp}/sparkletree-plugin"
@@ -12,7 +12,6 @@ session=$(printf '%s' "$input" | sed -n 's/^.*"session_id"[[:space:]]*:[[:space:
 [ -n "$session" ] || session=nosession
 case "$suffix" in
   generate_campaign|render_video) ;;
-  video_commission) printf '%s' "$input" | grep -q '"action"[[:space:]]*:[[:space:]]*"create"' || exit 0 ;;
   *) exit 0 ;;
 esac
 # An error envelope started nothing.
