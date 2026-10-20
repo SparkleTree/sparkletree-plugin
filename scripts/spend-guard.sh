@@ -45,9 +45,16 @@ data=${1:-${CLAUDE_PLUGIN_DATA:-}}
 have_jq=0; command -v jq >/dev/null 2>&1 && have_jq=1
 [ "${SPARKLETREE_NO_JQ:-}" = 1 ] && have_jq=0  # tests: behave as if jq were missing
 
-out() { # decision reason
-  reason=$(printf '%s' "$2" | sed 's/\\/\\\\/g; s/"/\\"/g')
-  printf '{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"%s","permissionDecisionReason":"%s"}}\n' "$1" "$reason"
+# The guard only ever answers "ask" or "deny", never "allow"; each decision is
+# a literal so a reader (or a directory validator) can see that without
+# running it.
+escape() { printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g'; }
+ask() { # reason
+  printf '{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"ask","permissionDecisionReason":"%s"}}\n' "$(escape "$1")"
+  exit 0
+}
+deny() { # reason
+  printf '{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"%s"}}\n' "$(escape "$1")"
   exit 0
 }
 
@@ -64,9 +71,9 @@ sha256() { # stdin -> lowercase hex digest, or nothing when no tool exists
 # text that identifies the call; empty means it cannot be matched to a yes.
 deny_once() {
   [ "${SPARKLETREE_SPEND_GUARD:-}" = prompt-only ] && exit 0
-  [ -n "$1" ] || out deny "$2 This call cannot be matched to an earlier yes, so the guard refuses it every time. Ask the user to install jq or to set SPARKLETREE_SPEND_GUARD=prompt-only."
+  [ -n "$1" ] || deny "$2 This call cannot be matched to an earlier yes, so the guard refuses it every time. Ask the user to install jq or to set SPARKLETREE_SPEND_GUARD=prompt-only."
   sig=$(printf '%s' "$1" | sha256)
-  [ -n "$sig" ] || out deny "$2 No SHA-256 tool (shasum, sha256sum or openssl) is installed, so the guard cannot record a yes and refuses this call every time. Ask the user to install one or to set SPARKLETREE_SPEND_GUARD=prompt-only."
+  [ -n "$sig" ] || deny "$2 No SHA-256 tool (shasum, sha256sum or openssl) is installed, so the guard cannot record a yes and refuses this call every time. Ask the user to install one or to set SPARKLETREE_SPEND_GUARD=prompt-only."
   mkdir -p "$data/confirm" 2>/dev/null
   c="$data/confirm/$sig"; taken="$c.$$"; now=$(date +%s)
   # mv is atomic: of several identical calls racing for one yes, one wins. A
@@ -79,7 +86,7 @@ deny_once() {
     esac
   fi
   printf '%s\n' "$now" > "$c" 2>/dev/null
-  out deny "$2 Stop, tell the user what this call does and what it costs, and ask in chat. Only after an explicit yes, make exactly the same call again within 15 minutes."
+  deny "$2 Stop, tell the user what this call does and what it costs, and ask in chat. Only after an explicit yes, make exactly the same call again within 15 minutes."
 }
 
 # Can the call be read? Anything else fails closed.
@@ -100,7 +107,7 @@ if [ -n "$why" ]; then
   }
   for a in $(vals agent_type | tr -cd 'A-Za-z0-9_:\n-'); do
     case "$a" in *campaign-reviewer|*analytics-digest)
-      out deny "SparkleTree: $why This runs inside a read-only agent, so the call is refused. Return it as a proposed call for the parent to confirm with the user." ;;
+      deny "SparkleTree: $why This runs inside a read-only agent, so the call is refused. Return it as a proposed call for the parent to confirm with the user." ;;
     esac
   done
   # A prompt only when every permission_mode in the text is a prompting mode.
@@ -108,7 +115,7 @@ if [ -n "$why" ]; then
   for m in $(vals permission_mode | tr -cd 'A-Za-z0-9_\n-'); do
     case "$m" in default|acceptEdits|plan) prompting=1 ;; *) prompting=0; break ;; esac
   done
-  [ $prompting = 1 ] && out ask "SparkleTree: $why Install jq to let reads and drafts through without a prompt."
+  [ $prompting = 1 ] && ask "SparkleTree: $why Install jq to let reads and drafts through without a prompt."
   # A retry differs only in tool_use_id: blank it when it occurs once. When it
   # occurs more than once the call cannot be keyed.
   key=""
@@ -132,7 +139,7 @@ case "$suffix" in query_*) exit 0 ;; esac
 
 case "$agent" in
   *campaign-reviewer|*analytics-digest)
-    out deny "The $agent agent is read-only. Do not call $suffix${action:+ action=$action}; return it as a proposed call for the parent to confirm with the user." ;;
+    deny "The $agent agent is read-only. Do not call $suffix${action:+ action=$action}; return it as a proposed call for the parent to confirm with the user." ;;
 esac
 
 level=none; msg=""
@@ -205,4 +212,4 @@ case "$pmode" in
     deny_once "$(printf '%s' "$input" | jq -cS '{s: (.session_id // ""), t: .tool_name, i: .tool_input}' 2>/dev/null)" \
       "SparkleTree: $msg This session runs in $pmode mode, so no permission prompt can appear." ;;
 esac
-out ask "SparkleTree: $msg"
+ask "SparkleTree: $msg"
