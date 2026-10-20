@@ -4,10 +4,12 @@ Any change to a tool schema on the server bumps the plugin version, gets a note 
 
 ## 0.3.0
 
-- Registry `server.json` 1.0.5: the MCP server no longer has the video commission tools (`video_commission`, `query_video_commissions`). The default profile is now 15 tools. Renders with `render_video` (campaign, template, still and Squid design video) are unchanged, and so are campaign images. Monorepo merge request in progress, which sets `MCP_SERVER_VERSION` 1.0.5; merge it first, then rerun its `mcp-version-sync` job.
+- Registry `server.json` 1.0.5: the MCP server no longer has the video commission tools (`video_commission`, `query_video_commissions`). The default profile is now 15 tools. Renders with `render_video` (campaign, template, still and Squid design video) are unchanged, and so are campaign images. This release publishes 1.0.5 to the registry first; the hosted server moves to 1.0.5 right after, because its version check waits for this `server.json` on main.
 - The plugin drops video commissions to match: the `video` skill, the orientation skill and its tool reference (15 tools) and glossary, `adapt`, the read-only agents' `disallowedTools`, the smoke eval runner, the spend guard and its PreToolUse matcher, the job watch and its PostToolUse matcher, `scripts/test-hooks.sh`, README, and AGENTS.md.
 - One server for everyone. Every install, Anthropic's plugin directory included, connects to `https://app.sparkletree.io/api/mcp`; there is no separate directory server.
 - The `directory` branch is no longer generated. The `directory-branch` CI job, `scripts/ci-directory-branch.sh`, `scripts/directory-transform.sh` and `scripts/test-directory-transform.sh` are gone, and `scripts/ci-validate.sh` and `scripts/ci-check-bump.sh` no longer special-case it. The existing remote branch is left as it is. Anthropic's listing uses `main`. Tagging and the registry publish are unchanged.
+- Listings describe SparkleTree as brand, web presence and campaigns online and on screens, not only campaigns: `plugin.json`, the Codex and Gemini manifests, `marketplace.json`, `server.json` and the OpenAI bundle.
+- Directory validation: `.claude-plugin/icon.png` (512 px square PNG), `privacyPolicyUrl` in `plugin.json`, and the spend guard writes its two decisions (`ask`, `deny`) as literals, so a reader can see it never answers `allow`. Its behaviour is unchanged.
 
 ## 0.2.2
 

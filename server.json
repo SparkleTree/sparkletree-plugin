@@ -2,8 +2,8 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.sparkletree/sparkletree",
   "title": "SparkleTree",
-  "description": "Create, publish and measure SparkleTree marketing campaigns from an AI client. OAuth 2.1 with PKCE.",
   "version": "1.0.5",
+  "description": "Build your brand and web presence, and run SparkleTree campaigns online and on screens, from AI.",
   "websiteUrl": "https://sparkletree.io",
   "repository": {
     "url": "https://gitlab.com/sparkletree/sparkletree-plugin",

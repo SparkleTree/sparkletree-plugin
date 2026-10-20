@@ -50,7 +50,7 @@ cat > "$out/.claude-plugin/plugin.json" <<'JSON'
   "name": "sparkletree",
   "displayName": "SparkleTree",
   "version": "0.1.0",
-  "description": "Create, publish and measure SparkleTree campaigns from your AI: skills for the campaign craft, a read-only reviewer and digest procedure, and guidance for the SparkleTree MCP server.",
+  "description": "Build your brand and web presence, and create, publish and measure SparkleTree campaigns online and on screens, from your AI: skills for the campaign craft, a read-only reviewer and digest procedure, and guidance for the SparkleTree MCP server.",
   "author": {
     "name": "SparkleTree",
     "email": "support@sparkletree.io",
