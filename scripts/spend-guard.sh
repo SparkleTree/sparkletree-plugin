@@ -128,9 +128,13 @@ fi
 fields=$(printf '%s' "$input" | jq -r '[.tool_name, .agent_type, .permission_mode, .session_id,
     (.tool_input | .action, .mode, .operation, .status, .publish)]
   | map(if . == null then "" else tostring | gsub("[^A-Za-z0-9_:-]"; "") end) | join("|")' 2>/dev/null)
-IFS='|' read -r tool agent pmode session action mode operation status publish <<EOF
-$fields
-EOF
+# Split on "|" without a here-document. The fields hold only [A-Za-z0-9_:-],
+# and globbing is off while they are split, so nothing in them is expanded.
+set -f; old_ifs=$IFS; IFS='|'
+# shellcheck disable=SC2086
+set -- $fields
+IFS=$old_ifs; set +f
+tool=${1:-} agent=${2:-} pmode=${3:-} session=${4:-} action=${5:-} mode=${6:-} operation=${7:-} status=${8:-} publish=${9:-}
 suffix=${tool##*__}
 session=$(printf '%s' "$session" | tr -cd 'A-Za-z0-9_-'); [ -n "$session" ] || session=nosession
 

@@ -9,7 +9,7 @@ Any change to a tool schema on the server bumps the plugin version, gets a note 
 - One server for everyone. Every install, Anthropic's plugin directory included, connects to `https://app.sparkletree.io/api/mcp`; there is no separate directory server.
 - The `directory` branch is no longer generated. The `directory-branch` CI job, `scripts/ci-directory-branch.sh`, `scripts/directory-transform.sh` and `scripts/test-directory-transform.sh` are gone, and `scripts/ci-validate.sh` and `scripts/ci-check-bump.sh` no longer special-case it. The existing remote branch is left as it is. Anthropic's listing uses `main`. Tagging and the registry publish are unchanged.
 - Listings describe SparkleTree as brand, web presence and campaigns online and on screens, not only campaigns: `plugin.json`, the Codex and Gemini manifests, `marketplace.json`, `server.json` and the OpenAI bundle.
-- Directory validation: `.claude-plugin/icon.png` (512 px square PNG), `privacyPolicyUrl` in `plugin.json`, and the spend guard writes its two decisions (`ask`, `deny`) as literals, so a reader can see it never answers `allow`. Its behaviour is unchanged.
+- Directory validation: a 512 px square PNG icon, which the Codex manifest now uses too (the WebP icon is gone), `privacyPolicyUrl` in `plugin.json`, and the spend guard writes its two decisions (`ask`, `deny`) as literals, so a reader can see it never answers `allow`, and splits its fields without a here-document. Its behaviour is unchanged.
 
 ## 0.2.2
 
@@ -61,7 +61,7 @@ Any change to a tool schema on the server bumps the plugin version, gets a note 
 
 ## 0.1.1
 
-- `.codex-plugin/plugin.json` for Codex and the OpenAI plugin portal, with `assets/icon.webp` (180 by 180).
+- `.codex-plugin/plugin.json` for Codex and the OpenAI plugin portal, with a 180 by 180 icon.
 - `surfaces-and-embed`: the publishable key is a signed credential required on every request; test keys work locally, live keys need a registered origin; `x-st-auth` / 401 `reason` + `remedy` troubleshooting.
 - Stop committing the generated `openai/` bundle. Its nested `.claude-plugin/plugin.json` made the claude.ai and Claude desktop marketplace importer reject the plugin with "plugin.json must be at .claude-plugin/plugin.json at the plugin root; found nested". `scripts/build-openai-bundle.sh` still produces it, gitignored, for the OpenAI zip.
 - `launch` skill description no longer uses angle brackets; the claude.ai importer flags them as XML.

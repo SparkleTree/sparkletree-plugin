@@ -43,7 +43,7 @@
       "Each morning at 6, find the internet's meme of the day and rewrite my campaign hero to joke about it"
     ],
     "brandColor": "#56F1B0",
-    "composerIcon": "./assets/icon.webp",
-    "logo": "./assets/icon.webp"
+    "composerIcon": "./.claude-plugin/icon.png",
+    "logo": "./.claude-plugin/icon.png"
   }
 }
