@@ -8,8 +8,9 @@ Registry `server.json` stays at 1.0.5; nothing changes for the tools. This relea
 
 - `.gitlab-ci.yml` only includes the CI definition, which now lives in the SparkleTree monorepo. The registry signing key and the two tool downloads CI needs are no longer in this repository. CI runs the same jobs as before.
 - The Codex manifest no longer names a logo file; upload the logo in the OpenAI portal.
+- The listing icon moves to `assets/icon.png`, so `.claude-plugin/` holds only the two manifests again and the maintainer scripts that work in that folder cannot reach an image.
 - `plugin.json` drops `privacyPolicyUrl`, which Claude Code does not read. The README lists the privacy policy and terms links on their own lines, so the directory reads the exact URL.
-- `evals/run-smoke.sh` passes the prompt to `claude -p` as an argument instead of piping it in.
+- The fallback eval runner (`evals/run-smoke.sh`) is removed; `claude plugin eval` runs the same cases.
 - The React SDK reference no longer links the SDK repository next to the publishable-key example.
 
 ## 0.3.0

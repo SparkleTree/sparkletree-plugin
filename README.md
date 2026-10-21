@@ -115,7 +115,7 @@ claude plugin validate --strict skills
 claude plugin validate --strict agents
 sh scripts/test-hooks.sh
 claude --plugin-dir .
-evals/run-smoke.sh            # or: claude plugin eval . --allow-tools Skill
+claude plugin eval . --allow-tools Skill
 scripts/build-openai-bundle.sh
 ```
 
