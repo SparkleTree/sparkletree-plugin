@@ -45,9 +45,20 @@ for d in skills/*/; do
   head -20 "$d/SKILL.md" | grep -q '^description: .*[<>]' && fail "skills/$n description contains angle brackets (claude.ai importer flags them as XML)"
 done
 
-# Hook scripts must parse as POSIX sh.
-for s in scripts/*.sh hooks/*.sh; do
-  [ -f "$s" ] && { sh -n "$s" || fail "$s does not parse"; }
-done
+# Every script must parse as POSIX sh. Each is named by its fixed path: a shell
+# pointed at a path in a variable is what Anthropic's directory validator holds
+# as able to run the icon. (sh -n checks only its first file, hence one line
+# each.) A new script fails the count until it gets its own line.
+for_sh_n=8
+set -- scripts/*.sh
+[ $# = $for_sh_n ] || fail "scripts/ holds $# scripts but ci-validate.sh checks $for_sh_n; add a sh -n line for the new one"
+sh -n scripts/bump-version.sh        || fail "scripts/bump-version.sh does not parse"
+sh -n scripts/check-connector.sh     || fail "scripts/check-connector.sh does not parse"
+sh -n scripts/ci-check-bump.sh       || fail "scripts/ci-check-bump.sh does not parse"
+sh -n scripts/ci-tag.sh              || fail "scripts/ci-tag.sh does not parse"
+sh -n scripts/ci-validate.sh         || fail "scripts/ci-validate.sh does not parse"
+sh -n scripts/semver-cmp.sh          || fail "scripts/semver-cmp.sh does not parse"
+sh -n scripts/test-ci-check-bump.sh  || fail "scripts/test-ci-check-bump.sh does not parse"
+sh -n scripts/test-hooks.sh          || fail "scripts/test-hooks.sh does not parse"
 
 echo "ok: plugin $claude_v, server.json $server_v"

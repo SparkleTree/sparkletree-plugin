@@ -112,7 +112,6 @@ claude plugin validate --strict agents
 sh scripts/test-hooks.sh
 claude --plugin-dir .
 claude plugin eval . --allow-tools Skill
-scripts/build-openai-bundle.sh
 ```
 
 Layout, tool-name notes and writing rules are in [AGENTS.md](AGENTS.md). Changes are listed in [CHANGELOG.md](CHANGELOG.md).
