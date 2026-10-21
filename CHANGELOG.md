@@ -2,6 +2,12 @@
 
 Any change to a tool schema on the server bumps the plugin version, gets a note here for the OpenAI re-review, and is batched into a Cursor release.
 
+## 0.4.1
+
+Registry `server.json` stays at 1.0.5.
+
+- `plugin.json` sets all five fields Anthropic's directory reads for the listing: `icon`, `documentationUrl` (the agent docs), `supportUrl` (the troubleshooting section of SETUP.md, which gives the support email), `privacyPolicyUrl` and `termsOfServiceUrl`. Claude Code ignores them at load time.
+
 ## 0.4.0
 
 Registry `server.json` stays at 1.0.5.
