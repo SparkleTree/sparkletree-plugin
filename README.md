@@ -94,7 +94,10 @@ When credits, an allowance or quota run out, the action is blocked with `precond
 
 ## Data
 
-Tool calls run as you, in one workspace, with your role. Removing the connector or disabling the plugin ends access; disabling an API key does the same for headless clients. Privacy policy: https://app.sparkletree.io/legal/privacy. Terms: https://app.sparkletree.io/legal/terms.
+Tool calls run as you, in one workspace, with your role. Removing the connector or disabling the plugin ends access; disabling an API key does the same for headless clients.
+
+- Privacy policy: https://app.sparkletree.io/legal/privacy
+- Terms: https://app.sparkletree.io/legal/terms
 
 ## Documentation and support
 
@@ -148,5 +151,7 @@ What CI enforces on every push (`scripts/ci-validate.sh`, `scripts/ci-check-bump
 - On `main`, the registry publish reads `server.json` only. It skips when the registry already lists that version, and refuses when the version was published before or is lower than the registry's latest. A plugin-only release is therefore a no-op for the registry.
 
 Tagging pushes with the job's own token, so there is no token to create or rotate. It needs one project setting: Settings, CI/CD, Job token permissions, "Allow Git push requests to the repository". Without it the tag job fails and says so.
+
+The CI definition itself lives in the SparkleTree monorepo; `.gitlab-ci.yml` here only includes it. The registry signing key is a protected CI variable on this project and appears in no file in this repository.
 
 Anthropic's plugin directory lists `main`: the same plugin and the same server (`https://app.sparkletree.io/api/mcp`) as every other install.

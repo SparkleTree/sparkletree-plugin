@@ -1,6 +1,6 @@
 {
   "name": "sparkletree",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Build your brand and web presence, and create, publish and measure SparkleTree campaigns online and on screens, from your AI: skills for the campaign craft, a read-only reviewer and digest agent, a spend guard, and the SparkleTree MCP server.",
   "author": {
     "name": "SparkleTree",
@@ -42,8 +42,6 @@
       "Check in on my brand presence with SparkleTree",
       "Each morning at 6, find the internet's meme of the day and rewrite my campaign hero to joke about it"
     ],
-    "brandColor": "#56F1B0",
-    "composerIcon": "./.claude-plugin/icon.png",
-    "logo": "./.claude-plugin/icon.png"
+    "brandColor": "#56F1B0"
   }
 }

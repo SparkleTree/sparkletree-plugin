@@ -1,7 +1,7 @@
 {
   "name": "sparkletree",
   "displayName": "SparkleTree",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Build your brand and web presence, and create, publish and measure SparkleTree campaigns online and on screens, from your AI: skills for the campaign craft, a read-only reviewer and digest agent, a spend guard, and the SparkleTree MCP server.",
   "author": {
     "name": "SparkleTree",
@@ -10,7 +10,6 @@
   },
   "homepage": "https://sparkletree.io",
   "repository": "https://gitlab.com/sparkletree/sparkletree-plugin",
-  "privacyPolicyUrl": "https://app.sparkletree.io/legal/privacy",
   "license": "MIT",
   "keywords": ["sparkletree", "marketing", "campaigns", "analytics", "mcp", "brand", "video", "signage"]
 }

@@ -12,8 +12,8 @@ for c in $cases; do
   [ -f "$dir/prompt.md" ] || continue
   prompt=$(awk 'f{print} /^---$/{n++; if(n==2) f=1}' "$dir/prompt.md")
   skill=$(sed -n 's/.*"(sparkletree:)?\([a-z-]*\)".*/\1/p' "$dir/graders/skill-loaded.md")
-  # The prompt goes in on stdin: --disallowedTools is variadic and would swallow a trailing argument.
-  out=$(printf '%s' "$prompt" | claude -p --plugin-dir "$root" --output-format stream-json --verbose --max-turns 6 \
+  # The prompt comes first: --disallowedTools is variadic and would swallow a trailing argument.
+  out=$(claude -p "$prompt" --plugin-dir "$root" --output-format stream-json --verbose --max-turns 6 \
     --disallowedTools "mcp__plugin_sparkletree_sparkletree__manage_campaigns,mcp__plugin_sparkletree_sparkletree__generate_campaign,mcp__plugin_sparkletree_sparkletree__manage_products,mcp__plugin_sparkletree_sparkletree__manage_surfaces,mcp__plugin_sparkletree_sparkletree__manage_brand,mcp__plugin_sparkletree_sparkletree__render_video,mcp__plugin_sparkletree_sparkletree__upload_asset" \
     2>/dev/null)
   if printf '%s' "$out" | grep -q "\"skill\":\"\(sparkletree:\)\{0,1\}$skill\""; then

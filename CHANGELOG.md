@@ -2,6 +2,16 @@
 
 Any change to a tool schema on the server bumps the plugin version, gets a note here for the OpenAI re-review, and is batched into a Cursor release.
 
+## 0.3.1
+
+Registry `server.json` stays at 1.0.5; nothing changes for the tools. This release clears Anthropic directory validation findings.
+
+- `.gitlab-ci.yml` only includes the CI definition, which now lives in the SparkleTree monorepo. The registry signing key and the two tool downloads CI needs are no longer in this repository. CI runs the same jobs as before.
+- The Codex manifest no longer names a logo file; upload the logo in the OpenAI portal.
+- `plugin.json` drops `privacyPolicyUrl`, which Claude Code does not read. The README lists the privacy policy and terms links on their own lines, so the directory reads the exact URL.
+- `evals/run-smoke.sh` passes the prompt to `claude -p` as an argument instead of piping it in.
+- The React SDK reference no longer links the SDK repository next to the publishable-key example.
+
 ## 0.3.0
 
 - Registry `server.json` 1.0.5: the MCP server no longer has the video commission tools (`video_commission`, `query_video_commissions`). The default profile is now 15 tools. Renders with `render_video` (campaign, template, still and Squid design video) are unchanged, and so are campaign images. This release publishes 1.0.5 to the registry first; the hosted server moves to 1.0.5 right after, because its version check waits for this `server.json` on main.
