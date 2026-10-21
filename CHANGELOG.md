@@ -2,15 +2,23 @@
 
 Any change to a tool schema on the server bumps the plugin version, gets a note here for the OpenAI re-review, and is batched into a Cursor release.
 
+## 0.3.2
+
+Registry `server.json` stays at 1.0.5. Clears the last directory validation findings that a change here can clear.
+
+- The spend guard names the text that identifies a call `call`, not `key`, so the validator no longer reads it as a credential. Behaviour is unchanged.
+- AGENTS.md, `evals/README.md` and this changelog describe the eval command in words, instead of as inline code whose last word is eval, which the validator read as a shell download-and-run.
+- No file names the icon path any more.
+
 ## 0.3.1
 
 Registry `server.json` stays at 1.0.5; nothing changes for the tools. This release clears Anthropic directory validation findings.
 
 - `.gitlab-ci.yml` only includes the CI definition, which now lives in the SparkleTree monorepo. The registry signing key and the two tool downloads CI needs are no longer in this repository. CI runs the same jobs as before.
 - The Codex manifest no longer names a logo file; upload the logo in the OpenAI portal.
-- The listing icon moves to `assets/icon.png`, so `.claude-plugin/` holds only the two manifests again and the maintainer scripts that work in that folder cannot reach an image.
+- The listing icon moves out of `.claude-plugin/` into `assets/`, so that folder holds only the two manifests again and the maintainer scripts that work in it cannot reach an image.
 - `plugin.json` drops `privacyPolicyUrl`, which Claude Code does not read. The README lists the privacy policy and terms links on their own lines, so the directory reads the exact URL.
-- The fallback eval runner (`evals/run-smoke.sh`) is removed; `claude plugin eval` runs the same cases.
+- The fallback eval runner (`evals/run-smoke.sh`) is removed; `claude plugin eval . --allow-tools Skill` runs the same cases.
 - The React SDK reference no longer links the SDK repository next to the publishable-key example.
 
 ## 0.3.0

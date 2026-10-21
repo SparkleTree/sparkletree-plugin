@@ -67,7 +67,7 @@ sha256() { # stdin -> lowercase hex digest, or nothing when no tool exists
   [ ${#d} = 64 ] && printf '%s' "$d"
 }
 
-# deny_once KEY REASON, for auto, bypassPermissions and dontAsk. KEY is the
+# deny_once CALL REASON, for auto, bypassPermissions and dontAsk. CALL is the
 # text that identifies the call; empty means it cannot be matched to a yes.
 deny_once() {
   [ "${SPARKLETREE_SPEND_GUARD:-}" = prompt-only ] && exit 0
@@ -98,7 +98,7 @@ elif ! printf '%s' "$input" | jq -e 'type == "object" and (.tool_name | type) ==
 fi
 
 if [ -n "$why" ]; then
-  # Every value of a key anywhere in the text. Used only where an extra,
+  # Every value of a field anywhere in the text. Used only where an extra,
   # nested value can make the answer stricter, never looser.
   vals() {
     printf '%s' "$input" | awk -v k="$1" '{ s = $0; re = "\"" k "\"[ \t]*:[ \t]*\"[^\"]*\""
@@ -117,12 +117,12 @@ if [ -n "$why" ]; then
   done
   [ $prompting = 1 ] && ask "SparkleTree: $why Install jq to let reads and drafts through without a prompt."
   # A retry differs only in tool_use_id: blank it when it occurs once. When it
-  # occurs more than once the call cannot be keyed.
-  key=""
+  # occurs more than once the call cannot be matched.
+  call=""
   if [ "$(vals tool_use_id | wc -l | tr -d ' ')" -le 1 ]; then
-    key=$(printf '%s' "$input" | awk '{ sub(/"tool_use_id"[ \t]*:[ \t]*"[^"]*"/, "\"tool_use_id\":\"\""); print }')
+    call=$(printf '%s' "$input" | awk '{ sub(/"tool_use_id"[ \t]*:[ \t]*"[^"]*"/, "\"tool_use_id\":\"\""); print }')
   fi
-  deny_once "$key" "SparkleTree: $why This session may run without permission prompts, so no prompt can appear."
+  deny_once "$call" "SparkleTree: $why This session may run without permission prompts, so no prompt can appear."
 fi
 
 fields=$(printf '%s' "$input" | jq -r '[.tool_name, .agent_type, .permission_mode, .session_id,
