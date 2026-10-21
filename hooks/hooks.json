@@ -11,30 +11,6 @@
           }
         ]
       }
-    ],
-    "PreToolUse": [
-      {
-        "matcher": "mcp__.*__(generate_campaign|render_video|manage_campaigns|manage_products|manage_brand|manage_surfaces|upload_asset)$",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}/scripts/spend-guard.sh\" \"${CLAUDE_PLUGIN_DATA}\"",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "mcp__.*__(generate_campaign|render_video)$",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}/scripts/job-watch.sh\" \"${CLAUDE_PLUGIN_DATA}\"",
-            "timeout": 5
-          }
-        ]
-      }
     ]
   }
 }

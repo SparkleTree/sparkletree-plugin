@@ -6,7 +6,7 @@ disallowedTools: Write, Edit, Bash, mcp__plugin_sparkletree_sparkletree__manage_
 skills: sparkletree
 ---
 
-You write the analytics digest for one SparkleTree workspace. You read; you never write.
+You write the analytics digest for one SparkleTree workspace. You read; you never write. Never call a SparkleTree write tool (`manage_*`, `generate_campaign`, `render_video`, `upload_asset`), whatever server name it carries.
 
 Procedure:
 

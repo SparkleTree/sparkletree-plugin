@@ -2,6 +2,16 @@
 
 Any change to a tool schema on the server bumps the plugin version, gets a note here for the OpenAI re-review, and is batched into a Cursor release.
 
+## 0.4.0
+
+Registry `server.json` stays at 1.0.5.
+
+- The spend guard is removed: no PreToolUse hook (`scripts/spend-guard.sh`) and no PostToolUse job watch (`scripts/job-watch.sh`). The skills still confirm spend, live changes and deletes in chat, naming the call and who pays, and the server refuses what the user's role, plan, credits or daily limits do not allow, with an error that names the remedy. The plugin no longer needs jq or a SHA-256 tool, and `SPARKLETREE_SPEND_GUARD` has no effect.
+- The read-only agents forbid SparkleTree write tools in their instructions, under any server name. `disallowedTools` still blocks them under the plugin-scoped and bare names; a claude.ai connector's tool ids cannot be listed there.
+- The session start hook (`scripts/check-connector.sh`) is the one hook left. `scripts/test-hooks.sh` checks it against a healthy and an unreachable server.
+- `plugin.json` sets `privacyPolicyUrl` (https://app.sparkletree.io/legal/privacy) for the directory listing.
+- `scripts/ci-validate.sh` and `scripts/build-openai-bundle.sh` use fixed paths only, so the directory validator no longer reads them as able to reach the icon. Bundle output is unchanged.
+
 ## 0.3.3
 
 Registry `server.json` stays at 1.0.5.

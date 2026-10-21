@@ -22,7 +22,7 @@ Map the sentence to exactly one write and read its current state first:
 | Brand voice, tagline, dos and donts | `query_brand` `action: get` | `manage_brand` `action: update_voice` or `update_brandbook` |
 | The brand home page itself (an agent-authored page) | `query_brand` `action: get_page` with `pageId` (the HTML and its `sha256`) | `manage_brand` `action: edit_page` with exact-text `edits` and `expectedSha256` (a draft), then `publish_page` on approval; `create_page` only for a new page; `revert_page` restores the default. See `skills/brand` section 6. |
 
-Name the campaign or brand subtree by name and id and echo it back. Brand writes need the admin role; if the user is not an admin, prepare the text and hand it over instead. Never target `generate_campaign`, `render_video`, `manage_products` `import_from_url` or `manage_campaigns` `generate_playbook` from this skill: they spend credits or daily render allowances, and a scheduled run cannot answer the spend hook.
+Name the campaign or brand subtree by name and id and echo it back. Brand writes need the admin role; if the user is not an admin, prepare the text and hand it over instead. Never target `generate_campaign`, `render_video`, `manage_products` `import_from_url` or `manage_campaigns` `generate_playbook` from this skill: they spend credits or daily render allowances, and a scheduled run has nobody to confirm the spend.
 
 ## 2. Resolve the source
 
@@ -38,7 +38,7 @@ On yes, make the single write from step 1. Saves republish automatically. Report
 
 ## 5. Make it recurring
 
-If the sentence has a schedule, create it in the host after the first run is approved. Claude Code: `/schedule` (a routine); the plugin's hook asks before spend in interactive sessions but cannot ask in a scheduled run, which is one more reason the prompt stays on free writes. Claude.ai and Claude desktop: a scheduled task. ChatGPT: a scheduled task. Other hosts: tell the user the schedule has to live in a host that can run prompts on a timer, and give them the prompt.
+If the sentence has a schedule, create it in the host after the first run is approved. Claude Code: `/schedule` (a routine); a scheduled run has nobody to confirm spend, which is why the prompt stays on free writes. Claude.ai and Claude desktop: a scheduled task. ChatGPT: a scheduled task. Other hosts: tell the user the schedule has to live in a host that can run prompts on a timer, and give them the prompt.
 
 The scheduled prompt must be self contained. Put in it: the workspace name, the target by name and id, the exact read and write calls, the source and how to fetch it, the content check from step 3, the rule that a failed check keeps the current text, and that each run ends with one line: date, source summary, old text, new text or "unchanged: reason". Tell the user the schedule runs under their account and role, changes nothing that costs credits, and stops when they delete the task or pause the campaign.
 

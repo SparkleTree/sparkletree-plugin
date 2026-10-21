@@ -36,6 +36,6 @@ Offer, in this order, and do only what the user picks:
 
 ## 5. What to remember
 
-Tell the user, once: reads are free; publish, deploy, delete and anything that generates or renders asks first (this plugin adds a hook that asks as well); credits come from the workspace's monthly pool; everything runs under their own account and role; removing the connector or the plugin ends access.
+Tell the user, once: reads are free; publish, deploy, delete and anything that generates or renders asks first; credits come from the workspace's monthly pool; everything runs under their own account and role; removing the connector or the plugin ends access.
 
 Point to `/sparkletree:launch`, `/sparkletree:analytics`, `/sparkletree:status`, `/sparkletree:adapt` (a one-sentence live change, once or on a schedule), `/sparkletree:products` (products and photos), `/sparkletree:squid-design` (a custom look for a Squid) and, if something fails, `skills/troubleshoot-connection`.

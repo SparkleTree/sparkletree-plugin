@@ -47,7 +47,7 @@ Tools with `readOnlyHint: true` spend no credits and change nothing. Two `manage
 
 Drafts need no extra yes beyond the user's request: `manage_brand` `create_page` and `edit_page` without `publish`, `create_version`, `put_files`, `create_file_upload`, and `manage_campaigns` `create_component` and `apply_template` without `publish`. Show the preview URL afterwards.
 
-State the exact call, the target by name and id, and who pays (the workspace's monthly credit pool or the daily allowance). Then wait. This plugin ships a hook that asks before every call in the lists above except `update_variant` (the hook cannot see whether the campaign is live) and `manage_products` `create`, `update` and `import_csv`; confirm those in chat. The hook is a backstop, not a substitute for asking. `manage_brand` is annotated destructive, so some hosts also ask before every `manage_brand` call, drafts included. Where jq is not installed, the plugin's hook asks before every SparkleTree write, drafts included, and its reason says so.
+State the exact call, the target by name and id, and who pays (the workspace's monthly credit pool or the daily allowance). Then wait. Nothing else asks for you: the yes in chat is the confirmation. `manage_brand` is annotated destructive, so some hosts also ask before every `manage_brand` call, drafts included. When the server refuses a call, its error names the reason and the remedy (see Errors below).
 
 `upload_asset` only stores a file in the workspace (`from_url`, `from_data`, or `create_upload` then `complete_upload` for a local or large file). It needs no confirmation beyond the user having asked for the file to be used. `query_assets` lists what is already stored, so check it before uploading the same file again.
 

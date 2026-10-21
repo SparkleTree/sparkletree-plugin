@@ -6,4 +6,4 @@ Run: `claude plugin eval . --allow-tools Skill`. The plugin eval command is earl
 
 The prompts allow loading skills but forbid SparkleTree tools in the graded turn, so a run needs no SparkleTree account and spends no credits. (A prompt that forbids every tool also forbids the Skill tool, and the `tool_used` grader then fails even when the model picked the right skill.)
 
-Hook behaviour has its own check: `sh scripts/test-hooks.sh` feeds hook payloads through `spend-guard.sh`, `job-watch.sh` and `check-connector.sh`, once with jq and once with the sed fallback.
+The session hook has its own check: `sh scripts/test-hooks.sh` runs `check-connector.sh` against a healthy and an unreachable server.
