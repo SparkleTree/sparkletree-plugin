@@ -39,7 +39,7 @@ server_base=$(at_base server.json);               server_now=$(jq -r .version se
 # under scripts/ is excluded.
 changed=$(git diff --name-only "$base" -- skills agents hooks assets scripts \
   .mcp.json .claude-plugin .codex-plugin gemini-extension.json \
-  ':(exclude)scripts/ci-*.sh' ':(exclude)scripts/bump-version.sh' ':(exclude)scripts/semver-cmp.sh' ':(exclude)scripts/build-openai-bundle.sh' ':(exclude)scripts/test-ci-check-bump.sh')
+  ':(exclude)scripts/ci-*.sh' ':(exclude)scripts/bump-version.sh' ':(exclude)scripts/semver-cmp.sh' ':(exclude)scripts/build-openai-bundle.sh' ':(exclude)scripts/test-ci-check-bump.sh' ':(exclude)scripts/test-hooks.sh')
 # A manifest whose only change is its version is the bump itself, not a change
 # that needs one.
 version_only() { # file
