@@ -2,6 +2,13 @@
 
 Any change to a tool schema on the server bumps the plugin version, gets a note here for the OpenAI re-review, and is batched into a Cursor release.
 
+## 0.3.3
+
+Registry `server.json` stays at 1.0.5.
+
+- The React SDK examples write the publishable key inline (`st_pk_live_...`) instead of reading it from an environment variable. It is public by design: it ships to the browser and is visible in page source.
+- `scripts/ci-validate.sh` finds nested plugin manifests with `git ls-files`, so it checks what would be committed and no longer walks the whole tree. `scripts/build-openai-bundle.sh` counts and checks the files it wrote instead of walking its output folder. The directory validator held both because a tree walk can reach the icon.
+
 ## 0.3.2
 
 Registry `server.json` stays at 1.0.5. Clears the last directory validation findings that a change here can clear.

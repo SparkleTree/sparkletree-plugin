@@ -32,7 +32,7 @@ grep -Eq '(server\.json`? |registry )'"$server_v"'([^0-9]|$)' CHANGELOG.md || fa
 
 # The claude.ai / desktop marketplace importer walks the whole tree and rejects
 # any plugin.json that is not at the root .claude-plugin/ (plugin 0.1.1 lesson).
-nested=$(find . -path ./.git -prune -o -type f -name plugin.json -path '*/.claude-plugin/*' -print | grep -v '^./.claude-plugin/plugin.json$' || true)
+nested=$(git ls-files -- ':(glob)**/.claude-plugin/plugin.json' | grep -v '^\.claude-plugin/plugin\.json$' || true)
 [ -z "$nested" ] || fail "nested plugin manifest(s) would break marketplace sync: $nested"
 [ ! -e openai ] || fail "generated openai/ bundle must not be committed"
 [ ! -e key.pem ] || fail "key.pem must not be committed"

@@ -7,7 +7,8 @@ Packages: `@sparkletree/core` (framework-agnostic wire and copy choreography), `
 ```tsx
 import { SparkletreeProvider, Hero, Cta } from "@sparkletree/react";
 
-<SparkletreeProvider publishableKey={process.env.NEXT_PUBLIC_SPARKLETREE_KEY}>
+// The publishable key from the dashboard. It ships to the browser and is visible in page source.
+<SparkletreeProvider publishableKey="st_pk_live_...">
   <Hero
     campaignId="camp_123"
     fallback={{ headline: "Software that meets the moment", body: "Adaptive creative for the whole funnel." }}

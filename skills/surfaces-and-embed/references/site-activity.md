@@ -21,7 +21,7 @@ track(context: { apiBase: string; organizationId: string; campaignId: string }, 
 ```ts
 import { decodePublishableKey, track } from "@sparkletree/core";
 
-const { apiBase, organizationId } = decodePublishableKey(process.env.NEXT_PUBLIC_SPARKLETREE_KEY!);
+const { apiBase, organizationId } = decodePublishableKey("st_pk_live_..."); // the publishable key from the dashboard
 const st = { apiBase, organizationId, campaignId: "<a campaign id of this workspace>" };
 
 export function record(type: "click" | "custom", context: Record<string, unknown>) {
