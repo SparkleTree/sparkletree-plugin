@@ -2,6 +2,12 @@
 
 Any change to a tool schema on the server bumps the plugin version, gets a note here for the OpenAI re-review, and is batched into a Cursor release.
 
+## Registry server.json 1.1.0
+
+Plugin stays 0.4.1; no tool's inputs change.
+
+- The live server's tool results render as cards on hosts that support MCP Apps: every tool carries a `_meta` link to an HTML card resource (platform, brand, products, assets, surfaces, analytics, video and the campaign inspector). Hosts without MCP Apps get the same text results as before.
+
 ## 0.4.1
 
 Registry `server.json` stays at 1.0.5.
