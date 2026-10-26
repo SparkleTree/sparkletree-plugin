@@ -2,6 +2,12 @@
 
 Any change to a tool schema on the server bumps the plugin version, gets a note here for the OpenAI re-review, and is batched into a Cursor release.
 
+## Registry server.json 1.1.1
+
+Plugin stays 0.4.1; no tool's inputs change.
+
+- Every tool now sets `annotations.title` to its human-readable name (the directory listings read the name from there), and `query_brand`, `manage_brand` and `upload_asset` link their documentation in the description. From Anthropic's connector review.
+
 ## Registry server.json 1.1.0
 
 Plugin stays 0.4.1; no tool's inputs change.
