@@ -47,7 +47,8 @@ Custom slot values for a design go in `update_variant` `contentStructure.squidSl
 
 A generated campaign comes with its chat set up. A campaign made with `create` gets it one of two ways:
 
-- `conversation: {enabled: true, inputPlaceholder, suggestedQuestions, productFacts or faqs, toggleLabel?, openingMessage?}`: chat on with your words. The card's answers are turned on and the copy card gets the brand colours. Free.
+- `conversation: {enabled: true, inputPlaceholder, suggestedQuestions, productFacts or faqs, toggleLabel?, openingMessage?, look?}`: chat on with your words. The card's answers are turned on. Free.
+- `look` sets the copy card's colours: `neutral` (white card, near-black ink, no brand colours) or a dashboard Look built from the brand colours: `brand`, `dusk`, `paper`, `neon`, `gallery`, `ember`, `tide`. Every one passes the text contrast check. The brand colours (`query_brand` `action: get`) are there to inform the choice, not to force it: pick what reads well over the variant's photo and with its copy. Without `look`, a card with no colours gets the most readable option; with `autoSetup`, the playbook model picks.
 - `autoSetup: true`: the platform writes the playbook, question chips and question box text from the campaign, its products and variants at activation (on `update`, at once). One model call; it may rewrite chat words you set.
 - `conversation: {enabled: false}`: no chat. The page runs the standard design, and custom designs and templates are refused until chat is on.
 
