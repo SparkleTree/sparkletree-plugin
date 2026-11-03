@@ -33,7 +33,7 @@ If generation fails, read the error remedy. `mode: regenerate` from the failing 
 
 `query_campaigns` `action: variants` on the new campaign. Hand the variants to the `sparkletree:campaign-reviewer` agent when available, or run `skills/review-variants` yourself. Present the findings as a diff-style list. Apply approved edits with `manage_campaigns` `action: update_variant`. Saves republish automatically.
 
-A generated campaign already carries its conversational playbook (the chat opening, product facts, FAQs and question chips the Squid answers with). A campaign made by hand with `manage_campaigns` `action: create` has none; publishing adds one automatically, and `manage_campaigns` `action: generate_playbook` with the `campaignId` writes or rewrites it on demand after product or variant edits. It runs paid inference; confirm first.
+A generated campaign already carries its conversational playbook (the chat opening, product facts, FAQs and question chips the Squid answers with). A campaign made by hand with `manage_campaigns` `action: create` needs its chat set up at creation: pass `conversation` with `enabled`, `inputPlaceholder`, `suggestedQuestions` and `productFacts` (or `faqs`), or `autoSetup: true` to have the platform write them at activation, or `conversation: {enabled: false}` for no chat. A create with neither is refused. Activation refuses a campaign whose chat is still not set up and lists what is missing in `details.missing`. `manage_campaigns` `action: generate_playbook` with the `campaignId` writes or rewrites the playbook on demand after product or variant edits. `autoSetup` and `generate_playbook` run paid inference; confirm first.
 
 ## 5. Publish and deploy
 

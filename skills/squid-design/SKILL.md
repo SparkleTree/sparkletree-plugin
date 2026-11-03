@@ -12,10 +12,10 @@ A design is one HTML document plus a manifest of slots. Publishing a design does
 1. `query_campaigns` `action: get_component` with `campaignId`. It returns:
    - `liveByVariant`: which design each variant runs (none means the standard Squid).
    - `components[]`: every stored design with `previewUrl` and the `variantIds` that carry it.
-   - `permissions`: `canDraft`, `canPublish`, and `publishBlockedReason` (role, shape, plan or disabled).
+   - `permissions`: `canDraft`, `canPublish`, and `publishBlockedReason` (role, shape, plan or disabled). With `shape`, `shapeBlocker` names what is missing: `conversation_off` (chat is off), `answers_off`, `answers_not_live` (answers set to preview only), `no_placeholder`, `no_copy` (the variant has no headline and body), `no_style` (the copy card has no colours), `no_variant`, or `shape_v1` (the campaign really is on the old shape).
    - `delivery`: whether the page is published and whether it needs a republish.
    - `agentGuide`: the authoring rules. The same text is the resource `mosaic://campaigns/{campaignId}/squid-component-guide`.
-2. Read the guide before writing anything. It carries the brand palette and fonts, the current copy of every variant, the size limits, and the `window.sparkletree` bridge the platform injects (slot values, the surface size, `ready()`). If the guide says the campaign is not on the V2 shape with the copy card yet, drafts still work but publishing is refused: tell the user to switch the shape in the dashboard first.
+2. Read the guide before writing anything. It carries the brand palette and fonts, the current copy of every variant, the size limits, and the `window.sparkletree` bridge the platform injects (slot values, the surface size, `ready()`). If the guide says the campaign cannot show a design yet, drafts still work but publishing is refused; the guide names the missing piece and the fix. Most often chat is off: `manage_campaigns` `action: update` with `conversation: {enabled: true}` turns chat and the card's answers on and gives the card the brand colours (confirm first: it changes the live page). `shape: "v2"` switches a campaign that really is on the old shape.
 3. `query_brand` `action: get` for colours, fonts and voice, and `query_campaigns` `action: variants` for the copy the design will carry.
 
 If `publishBlockedReason` is `plan` or `disabled`, say so before writing anything: the workspace can look but cannot publish designs.
@@ -84,9 +84,11 @@ For a social clip of a variant that runs a published design: `render_video` `mod
 | `forbidden`, read-only designs | The plan does not include custom designs (Starter or no active plan). Applies to drafts, templates, checks and design video too |
 | `forbidden`, role | Draft, apply as draft, check, match and get a template need member; publish, apply with `publish: true` and revert need admin |
 | `upstream_error` on `mode: squid` | The plan lookup failed; nothing was queued. Retry once later |
-| `precondition_failed` on `apply_template` | The campaign is on the old Squid shape, the template is excluded, or a write raced; the remedy says which |
+| `precondition_failed` on `apply_template` or `publish_component` | The campaign cannot show a design yet (chat off, no colours, no headline and body, old shape), the template is excluded, or a write raced. `error.details.blocker` and the remedy say which |
 | `precondition_failed` "not available" on `mode: squid` | Design video is switched off on this deployment |
 | `precondition_failed` "publish a custom design" | The variant runs no published design; publish one first |
 | `precondition_failed` in flight | A recording is already running; poll it |
-| `squid_shape_not_v2` | The campaign uses the old Squid shape; the remedy says how to switch |
+| `squid_shape_not_v2` | The campaign uses the old Squid shape; the remedy says how to switch (`update` with `shape: "v2"`) |
+| `squid_conversation_off`, `squid_answers_off`, `squid_answers_preview_only`, `squid_copy_card_no_style` | The campaign is on V2 but its copy card does not show; `update` with `conversation: {enabled: true}` fixes it |
+| `squid_copy_card_no_placeholder`, `squid_copy_card_no_copy` | The question box has no text, or the variant has no headline and body; the remedy names the field |
 | Daily limit on `check_component` | The browser check did not run (`not_run` with the reason); the static findings still came back. Try tomorrow (UTC) |

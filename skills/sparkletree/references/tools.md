@@ -24,8 +24,8 @@ Fifteen tools on the bare URL (`external_default`). Reads and writes never share
 
 | Action | Needs | Notes |
 |---|---|---|
-| `create` | `name`, `goal` | Empty shell: no AI, no variants, no playbook. Use `generate_campaign` for AI generation |
-| `update` | `campaignId` | `status: "active"` needs at least one variant, writes a playbook if missing, publishes the web page if the campaign runs nowhere, and may return `approval: {status: "required"}` when the workspace wants a second approver |
+| `create` | `name`, `goal`, and `conversation` or `autoSetup: true` | A campaign without AI generation and with no variants yet. The chat must be set up: `conversation` sets it yourself, `autoSetup: true` has the platform write it at activation (one model call). Without either the answer is `invalid_input` naming `conversation`. Use `generate_campaign` for AI generation |
+| `update` | `campaignId` | Also takes `conversation`, `shape` (`v1` or `v2`) and `autoSetup: true` (sets up now). `status: "active"` needs at least one variant and, at first launch, a set-up chat: otherwise `precondition_failed` with `details.missing` and a remedy, unless `autoSetup` was asked for. It publishes the web page if the campaign runs nowhere, and may return `approval: {status: "required"}` when the workspace wants a second approver |
 | `create_variant`, `update_variant` | `campaignId` (+ `variantId`) | `contentStructure` is merged field by field; `isActive: false` retires reversibly. Saves on a live campaign republish. `contentStructure` image and video take `{assetId}` (from `upload_asset` or `query_assets`) or `{url}`; a link to another site is copied into the workspace |
 | `delete`, `delete_variant` | ids | Permanent |
 | `publish` | `campaignId` | `visibility: "public"` lets the edge serve the page publicly; omit it to leave the setting unchanged |
@@ -42,6 +42,16 @@ Fifteen tools on the bare URL (`external_default`). Reads and writes never share
 | `apply_template` | `campaignId`, `templateId` | Uses a template from the Squid template library as the campaign's design, baked with the brand book. Without `publish` it stores a draft design (member). `publish: true` adds it as a new variant at once (admin), with `copyFromVariantId`, `variantName` and `slotValues` (only with `publish: true`). The answer lists `filledSlots`, `emptyClaimSlots` (price, offer, dates and other claims with no value; they show empty until set with `update_variant` `contentStructure.squidSlots`) and a `summary` of what to do next |
 
 Custom slot values for a design go in `update_variant` `contentStructure.squidSlots` (`{slotName: value}`); sending `squidSlots` replaces the whole object.
+
+### Setting up the chat on a campaign made with `create`
+
+A generated campaign comes with its chat set up. A campaign made with `create` gets it one of two ways:
+
+- `conversation: {enabled: true, inputPlaceholder, suggestedQuestions, productFacts or faqs, toggleLabel?, openingMessage?}`: chat on with your words. The card's answers are turned on and the copy card gets the brand colours. Free.
+- `autoSetup: true`: the platform writes the playbook, question chips and question box text from the campaign, its products and variants at activation (on `update`, at once). One model call; it may rewrite chat words you set.
+- `conversation: {enabled: false}`: no chat. The page runs the standard design, and custom designs and templates are refused until chat is on.
+
+At first activation, `details.missing` lists what is still missing: `chat_not_set`, `playbook_missing`, `questions_missing`, `placeholder_missing`, `variant_copy_missing` (the first variant has no headline and body). The variant needs a `contentStructure` `headline` and `body` for the copy card.
 
 ## query_campaigns: forecast and template reads
 
