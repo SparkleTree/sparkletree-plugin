@@ -5,7 +5,7 @@ Any change to a tool schema on the server bumps the plugin version, gets a note 
 ## 0.7.0
 
 - Registry `server.json` 1.6.0: the `manage_campaigns` `create_component` manifest takes `capabilities.chat`: `standard` (the default, the campaign's chat bar over the design), `own` (the design has its own way to ask and uses `sparkletree.ask`; `ask: true` is the older spelling and still accepted) or `none` (no chat on the design). Schema change: needs the OpenAI re-review and the Cursor release.
-- `squid-design` describes `capabilities.chat`, and its example manifest uses it.
+- `squid-design` describes `capabilities.chat`, and its example manifest uses it. The tool table lists it under `create_component`.
 
 ## 0.6.0
 
