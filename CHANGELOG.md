@@ -2,6 +2,11 @@
 
 Any change to a tool schema on the server bumps the plugin version, gets a note here for the OpenAI re-review, and is batched into a Cursor release.
 
+## 0.6.0
+
+- Registry `server.json` 1.5.0 (server 1.4.0 Locked, 1.5.0 Approve first; both ship together): per-market copy approval. `manage_campaigns` gains `approve_market_copy` with `operation` `set_mode`, `remove`, `approve`, `edit` or `lock`, and fields `market` (`languages`, optional `countries`), `marketMode` (`live`, `locked` or `approve_first`), `variantId`, `copy` (`greeting`, `headline`, `body`, `cta`) and `pendingId` (a version waiting for review, to approve, edit and approve, or edit and lock). Editors and admins only. `query_campaigns` gains `market_copy` (read, any role): each market with its mode, each variant's approved version (current or stale), each variant's source copy, and for Approve first markets `pending`: versions waiting for review with `id`, `state` (`ready`, or `writing` while its copy is still being written), the view's facts and its copy slot. A locked or Approve first market's viewers get the approved version or the variant's source copy, never copy a model wrote for them; their chat labels and `/c/` language pages follow the same rule. Schema change: needs the OpenAI re-review and the Cursor release.
+- The tool table describes `approve_market_copy` and `market_copy`.
+
 ## 0.5.0
 
 - Registry `server.json` 1.3.0: `manage_campaigns` `create` needs `conversation` (the chat, set up by the caller) or `autoSetup: true` (the platform writes it at activation, one model call); a create with neither is `invalid_input`. `update` takes `conversation`, `shape` and `autoSetup: true`. The first activation of a campaign whose chat is not set up is `precondition_failed` with `details.missing`. A refused custom design or template names what is missing (`squid_conversation_off`, `squid_copy_card_no_style` and others, `error.details.blocker`) instead of "switch the shape"; `get_component` `permissions.shapeBlocker` says it before the call. `conversation.look` chooses the copy card's colours (`neutral` or a Look built from the brand colours); the playbook model picks among the same options when it writes the chat. Schema change: needs the OpenAI re-review and the Cursor release.

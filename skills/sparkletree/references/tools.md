@@ -5,8 +5,8 @@ Fifteen tools on the bare URL (`external_default`). Reads and writes never share
 | Tool | Read or write | Actions | Notes |
 |---|---|---|---|
 | `get_platform_info` | read | `topic: health, organization, tool_profiles` | `organization` is the default: workspace name, plan, usage counts |
-| `query_campaigns` | read | `action: list, get, variants, deployments, generation_status, share_links, dooh_status, dooh_analytics, manifest, get_component, forecast, list_templates, get_template` | `list` pages with `cursor`; `get` accepts `include: [variants, products, targeting, experiments, generatedContent]`; `get_component` returns the campaign's custom Squid designs, which design each variant runs, preview URLs, permissions and the design guide. `forecast` and the template reads: see below |
-| `manage_campaigns` | write | `action: create, update, delete, create_variant, update_variant, delete_variant, publish, deploy, update_deployment, duplicate, create_share_link, revoke_share_link, generate_playbook, create_component, publish_component, revert_component, check_component, match_templates, apply_template` | See below. `check_component` and `match_templates` change no campaign data but use a daily workspace allowance |
+| `query_campaigns` | read | `action: list, get, variants, deployments, generation_status, share_links, dooh_status, dooh_analytics, manifest, get_component, forecast, list_templates, get_template, market_copy` | `list` pages with `cursor`; `get` accepts `include: [variants, products, targeting, experiments, generatedContent]`; `get_component` returns the campaign's custom Squid designs, which design each variant runs, preview URLs, permissions and the design guide. `forecast` and the template reads: see below |
+| `manage_campaigns` | write | `action: create, update, delete, create_variant, update_variant, delete_variant, publish, deploy, update_deployment, duplicate, create_share_link, revoke_share_link, generate_playbook, create_component, publish_component, revert_component, check_component, match_templates, apply_template, approve_market_copy` | See below. `check_component` and `match_templates` change no campaign data but use a daily workspace allowance |
 | `generate_campaign` | write, credits | `mode: start` (needs `intent`), `mode: regenerate` (needs `campaignId`, `fromStep`) | Async. Poll `query_campaigns` `generation_status`. The credits for the campaign's AI images are set aside when the call is accepted, in both modes; when the workspace has too few, nothing starts and the answer is `precondition_failed` with `details.imageCount`, `creditsNeeded`, `creditsRemaining` and a remedy (generate with `options.includeImages: false`, retry later, or ask the workspace admin). Over campaign quota: `precondition_failed` |
 | `query_products` | read | `action: list, get, import_status` | `get` returns `images[]` with `id`, `url`, `role`, `position` (primary first); `list` does not |
 | `manage_products` | write | `action: create, import_from_url, update, delete, import_csv, add_image, remove_image, set_primary_image, reorder_images` | See below |
@@ -41,6 +41,8 @@ Fifteen tools on the bare URL (`external_default`). Reads and writes never share
 | `match_templates` | `campaignId`, optional `mode` (best or cast), `limit` (default 6, max 50) | Member. Changes no campaign data. The templates that suit the campaign's business, with reasons and a preview link each. May make a model call (30 uncached matches per workspace per UTC day, a match is kept for 7 days); without the model it ranks by words and says so in `fallbackReason` |
 | `apply_template` | `campaignId`, `templateId` | Uses a template from the Squid template library as the campaign's design, baked with the brand book. Without `publish` it stores a draft design (member). `publish: true` adds it as a new variant at once (admin), with `copyFromVariantId`, `variantName` and `slotValues` (only with `publish: true`). The answer lists `filledSlots`, `emptyClaimSlots` (price, offer, dates and other claims with no value; they show empty until set with `update_variant` `contentStructure.squidSlots`) and a `summary` of what to do next |
 
+| `approve_market_copy` | `campaignId`, `operation`, `market` | Editor or admin. Per-market copy approval (see "Market approval" below). `set_mode` needs `marketMode`; `approve`, `edit` and `lock` need `variantId` or `pendingId`; `edit` needs `copy`. A person may approve copy someone else wrote. Text that drops a kept glossary term is saved, and the answer's `warnings` say which |
+
 Custom slot values for a design go in `update_variant` `contentStructure.squidSlots` (`{slotName: value}`); sending `squidSlots` replaces the whole object.
 
 ### Setting up the chat on a campaign made with `create`
@@ -53,6 +55,16 @@ A generated campaign comes with its chat set up. A campaign made with `create` g
 - `conversation: {enabled: false}`: no chat. The page runs the standard design, and custom designs and templates are refused until chat is on.
 
 At first activation, `details.missing` lists what is still missing: `chat_not_set`, `playbook_missing`, `questions_missing`, `placeholder_missing`, `variant_copy_missing` (the first variant has no headline and body). The variant needs a `contentStructure` `headline` and `body` for the copy card.
+
+### Market approval
+
+A market is one or more languages (`["fr"]`, `["fr-CA"]`), optionally narrowed to countries (`["CA"]`); a view's market is the most specific match. Each market has a mode:
+
+- `live` (the default for every market): viewers get copy adapted for each view.
+- `locked`: viewers get the version approved for the variant, or the variant's source copy when none is current. No model writes copy, chat labels or `/c/` language pages for them.
+- `approve_first`: viewers get what `locked` gives. Their views are queued for review; the adapted copy is written when the queue is read (`query_campaigns` `market_copy`), and `pending` lists it. An item with `state: "writing"` has no copy yet: read `market_copy` again in about a minute. Approve a `ready` item with `approve_market_copy` and its `pendingId` (`edit` with `copy` to change it first, `lock` to also lock the market).
+
+An approval goes stale when someone edits the variant's copy: it is not served, the market shows the source copy, and `market_copy` marks it `stale` until it is approved again (`operation: approve`). Approved copy is stored copy and never carries the adaptation mark. Legal lines are separate and show in every mode.
 
 ## query_campaigns: forecast and template reads
 
