@@ -45,12 +45,12 @@ One complete HTML document (doctype to closing html tag), 512 KiB at most; CSS a
     { "source": "standard", "name": "cta" },
     { "source": "custom", "name": "offer_terms", "kind": "text", "label": "Offer terms", "maxLength": 120, "fallback": "While stocks last" }
   ],
-  "capabilities": { "ask": true },
+  "capabilities": { "chat": "standard" },
   "video": { "durationMs": 8000 }
 }
 ```
 
-Standard slots (`source: "standard"`) are greeting, headline, body and cta and are filled from the variant's copy. Custom slots (`source: "custom"`, a lowercase `name` of up to 32 characters) have a `kind` of text, list, image or url; at most 24 slots. `video.durationMs` (3000 to 60000) sets the length of a recorded video, and `video.viewport` (`"output"` or `{width, height}` in CSS px, 320 to 1920) the size the design is laid out at when it is recorded. Designs show on every surface and aspect ratio, so lay out for both portrait and landscape.
+`capabilities.chat` says how the campaign's chat appears with the design. `standard` (the default): the page draws the campaign's chat bar along the bottom of the design (a round chat button on wide banners), so keep that area free of text and controls. `own`: the design has its own way to ask, a text field or an Ask button, and sends the question with `sparkletree.ask(text)`; the older `"ask": true` means the same. `none`: no chat on this design, for places nobody types, such as a menu board. Standard slots (`source: "standard"`) are greeting, headline, body and cta and are filled from the variant's copy. Custom slots (`source: "custom"`, a lowercase `name` of up to 32 characters) have a `kind` of text, list, image or url; at most 24 slots. `video.durationMs` (3000 to 60000) sets the length of a recorded video, and `video.viewport` (`"output"` or `{width, height}` in CSS px, 320 to 1920) the size the design is laid out at when it is recorded. Designs show on every surface and aspect ratio, so lay out for both portrait and landscape.
 
 `manage_campaigns` `action: create_component` with `campaignId`, `html`, `manifest` and a one-line `notes`. The member role can draft. The answer carries a `previewUrl` on the real host. Send the `previewUrl` to the user, not the `documentUrl` (a browser tab opened on the document shows nothing). Revise with another `create_component`; each call stores a new version.
 

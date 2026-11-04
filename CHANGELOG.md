@@ -2,6 +2,11 @@
 
 Any change to a tool schema on the server bumps the plugin version, gets a note here for the OpenAI re-review, and is batched into a Cursor release.
 
+## 0.7.0
+
+- Registry `server.json` 1.6.0: the `manage_campaigns` `create_component` manifest takes `capabilities.chat`: `standard` (the default, the campaign's chat bar over the design), `own` (the design has its own way to ask and uses `sparkletree.ask`; `ask: true` is the older spelling and still accepted) or `none` (no chat on the design). Schema change: needs the OpenAI re-review and the Cursor release.
+- `squid-design` describes `capabilities.chat`, and its example manifest uses it.
+
 ## 0.6.0
 
 - Registry `server.json` 1.5.0 (server 1.4.0 Locked, 1.5.0 Approve first; both ship together): per-market copy approval. `manage_campaigns` gains `approve_market_copy` with `operation` `set_mode`, `remove`, `approve`, `edit` or `lock`, and fields `market` (`languages`, optional `countries`), `marketMode` (`live`, `locked` or `approve_first`), `variantId`, `copy` (`greeting`, `headline`, `body`, `cta`), `labels` (the chat labels approved with the copy: `suggestedQuestions`, one per suggested question of the variant, `inputPlaceholder`, `ctaLabel`) and `pendingId` (a version waiting for review, to approve, edit and approve, or edit and lock). Editors and admins only. `query_campaigns` gains `market_copy` (read, any role): each market with its mode, each variant's approved version (current or stale), each version's approved chat labels with their status (`versions[].labels`), each variant's source copy and source chat labels (`variants[].sourceLabels`), and for Approve first markets `pending`: versions waiting for review with `id`, `state` (`ready`, or `writing` while its copy is still being written), the view's facts, its copy slot and the chat labels drafted for its language (`labels`). A locked or Approve first market's viewers get the approved version or the variant's source copy, never copy a model wrote for them. Its chat labels (suggested questions, question box text, chat button) are the ones approved with the copy, or the source labels; without `labels`, an approval stores the labels drafted once for the market's language. `/c/` language pages follow the same rule. Schema change: needs the OpenAI re-review and the Cursor release.
