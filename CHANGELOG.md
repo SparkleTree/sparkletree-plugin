@@ -2,6 +2,10 @@
 
 Any change to a tool schema on the server bumps the plugin version, gets a note here for the OpenAI re-review, and is batched into a Cursor release.
 
+## 0.7.1
+
+- The session start hook is removed, so the plugin has no hooks. Anthropic's directory accepts command hooks only from Verified organizations. Gone with it: `hooks/hooks.json`, `scripts/check-connector.sh`, `scripts/test-hooks.sh`, the `hooks` entry in the Codex manifest, the health check at session start and the routing line it added to the model's context. `SPARKLETREE_HEALTH_URL` and `SPARKLETREE_SESSION_CONTEXT` have no effect. The `sparkletree` skill still routes requests to the right skill. The plugin now makes no network calls of its own.
+
 ## 0.7.0
 
 - Registry `server.json` 1.6.0: the `manage_campaigns` `create_component` manifest takes `capabilities.chat`: `standard` (the default, the campaign's chat bar over the design), `own` (the design has its own way to ask and uses `sparkletree.ask`; `ask: true` is the older spelling and still accepted) or `none` (no chat on the design). Schema change: needs the OpenAI re-review and the Cursor release.

@@ -5,5 +5,3 @@ One case per model-invocable skill, plus `squid-templates` (the template library
 Run: `claude plugin eval . --allow-tools Skill`. The plugin eval command is early access in Claude Code 2.1.257. Results land in `evals/results/`, which is ignored by git.
 
 The prompts allow loading skills but forbid SparkleTree tools in the graded turn, so a run needs no SparkleTree account and spends no credits. (A prompt that forbids every tool also forbids the Skill tool, and the `tool_used` grader then fails even when the model picked the right skill.)
-
-The session hook has its own check: `sh scripts/test-hooks.sh` runs `check-connector.sh` against a healthy and an unreachable server.

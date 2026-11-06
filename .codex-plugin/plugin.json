@@ -1,6 +1,6 @@
 {
   "name": "sparkletree",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "Build your brand and web presence, and create, publish and measure SparkleTree campaigns online and on screens, from your AI: skills for the campaign craft, a read-only reviewer and digest agent, and the SparkleTree MCP server.",
   "author": {
     "name": "SparkleTree",
@@ -22,7 +22,6 @@
   ],
   "skills": "./skills/",
   "mcpServers": "./.mcp.json",
-  "hooks": "./hooks/hooks.json",
   "interface": {
     "displayName": "SparkleTree",
     "shortDescription": "Build your brand and run SparkleTree campaigns",

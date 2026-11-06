@@ -39,20 +39,16 @@ Publishing puts the campaign on your brand page (`<name>.sparkletree.io` or your
 
 Reads never ask. Two actions that change no campaign data still ask, because they use a daily workspace allowance: a browser check of a Squid design (`check_component`) and ranking the template library (`match_templates`). Publish, deploy, delete, and anything that generates, renders or runs in a sandbox ask first, in the conversation: the model names the call and what it spends or changes, then waits for your yes. Drafts (a brand page draft, a design draft) do not ask. When the server refuses a call (your role, your plan, too few credits or a daily limit), its answer says why and what to do.
 
-`SPARKLETREE_SESSION_CONTEXT=off` keeps the plugin's one routing line out of the model's context at session start.
-
-
 ## If something fails
 
 - Tools missing: new session, then `/mcp`.
 - 401 or sign-in loop: `/mcp`, sparkletree, authenticate; or remove and re-add the connector.
 - "connection failed" after a successful sign-in: the account has no workspace yet; finish onboarding at https://app.sparkletree.io.
 - 429: 120 requests per minute per token; wait and retry.
-- A message at session start that SparkleTree did not answer: the health check at `https://app.sparkletree.io/api/health` timed out (2 s). Try a read; if it fails too, wait and retry.
 - Blocked with `precondition_failed` or `entitlement_required`: the workspace's quota, credits or plan blocks the action. Published campaigns keep serving.
 
 The troubleshoot-connection skill walks the same list with more detail. Support: support@sparkletree.io (workspace name, tool, error code, time; never the token).
 
 ## Remove
 
-`/plugin uninstall sparkletree` removes the skills, agents, hooks and server declaration. Revoke a hand-added connector in the client's settings. Disable API keys under Settings, API keys in the dashboard.
+`/plugin uninstall sparkletree` removes the skills, agents and server declaration. Revoke a hand-added connector in the client's settings. Disable API keys under Settings, API keys in the dashboard.

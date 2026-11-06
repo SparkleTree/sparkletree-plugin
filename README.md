@@ -42,7 +42,7 @@ Customize, Plugins, Add, Add marketplace, Add from a repository. Paste `https://
 npx skills add SparkleTree/sparkletree-plugin
 ```
 
-This installs the skills without the MCP server declaration, hooks or agents. Add the connector in your client separately (below).
+This installs the skills without the MCP server declaration or agents. Add the connector in your client separately (below).
 
 ### Claude.ai and Claude desktop (connector only)
 
@@ -69,13 +69,11 @@ Point the client at `https://app.sparkletree.io/api/mcp` over streamable HTTP. A
 | Skills `launch-campaign`, `products`, `brand`, `squid-design`, `review-variants`, `analytics`, `status`, `video`, `surfaces-and-embed`, `adapt`, `agency-workspaces`, `troubleshoot-connection` | One job each: product URL or goal to a live link; products, photos and file uploads; brand book, voice, brand page and brand site; custom Squid designs, templates, design checks and design video; variant critique; results and reports; what is live and running; video renders from campaigns and templates; website, React SDK, screens and QR; a one-sentence live change, once or on a schedule; several client workspaces; connection problems. The model loads them when a request fits; you can also type `/sparkletree:<name>`. |
 | Commands `/sparkletree:setup`, `/sparkletree:launch` | Guided first half hour, and a launch from a product URL or a goal. Only you can run these. |
 | Agents `campaign-reviewer`, `analytics-digest` | Read-only subagents. They return verdicts and proposals; the main conversation confirms and writes. |
-| Hook: session start | A two-second health check of the server, silent when it answers and one line when it does not, plus one routing line in the model's context that names the skills. Never blocks. |
 
 ## What the plugin runs, sends and fetches
 
 - Tool calls go to `https://app.sparkletree.io/api/mcp` and run as you, in one workspace, with your role.
-- At session start (`startup`, `clear`, `compact`), `scripts/check-connector.sh` sends one GET to `https://app.sparkletree.io/api/health` with curl, without credentials and with a two-second limit. Set `SPARKLETREE_HEALTH_URL` to check another address. Without curl it skips the check. It adds one line to the model's context that routes SparkleTree requests to the right skill; `SPARKLETREE_SESSION_CONTEXT=off` leaves that line out.
-- Nothing else. The plugin has no telemetry and makes no other network calls. The hook script is POSIX sh and needs nothing but curl, which it skips when curl is missing.
+- Nothing else. The plugin has no hooks and no telemetry, runs no scripts on your machine and makes no network calls of its own.
 
 ## Who pays for what
 
@@ -109,7 +107,6 @@ claude plugin validate --strict .
 claude plugin validate --strict .claude-plugin/plugin.json
 claude plugin validate --strict skills
 claude plugin validate --strict agents
-sh scripts/test-hooks.sh
 claude --plugin-dir .
 claude plugin eval . --allow-tools Skill
 ```
@@ -122,7 +119,7 @@ Four files carry a version. They describe two different things, so they do not a
 
 | File | What it versions | Bump when |
 | --- | --- | --- |
-| `.claude-plugin/plugin.json` | The plugin package: skills, commands, agents, hooks | Anything in this repo that a user of the plugin can notice |
+| `.claude-plugin/plugin.json` | The plugin package: skills, commands, agents | Anything in this repo that a user of the plugin can notice |
 | `.codex-plugin/plugin.json` | The same package, for Codex and the OpenAI portal | Always together with the Claude manifest, same number |
 | `gemini-extension.json` | The same package, for Gemini CLI | Always together with the Claude manifest, same number |
 | `server.json` | The hosted MCP server at `https://app.sparkletree.io/api/mcp`, as listed in the official MCP registry | Only when the server's tools, resources, auth or endpoint change |
@@ -142,7 +139,7 @@ Releasing:
 What CI enforces on every push (`scripts/ci-validate.sh`, `scripts/ci-check-bump.sh`):
 
 - The three plugin manifests agree, and `CHANGELOG.md` has a section for that version and mentions the current `server.json` version.
-- A change under `skills/`, `agents/`, `hooks/`, `assets/`, to `.mcp.json`, to any of the three plugin manifests or the marketplace file, or to the hook scripts without a plugin bump fails. A manifest change that only moves its version is the bump itself and passes. Neither version may go backwards.
+- A change under `skills/`, `agents/`, `hooks/`, `assets/`, to `.mcp.json`, or to any of the three plugin manifests or the marketplace file without a plugin bump fails. A manifest change that only moves its version is the bump itself and passes. Neither version may go backwards.
 - On `main`, the registry publish reads `server.json` only. It skips when the registry already lists that version, and refuses when the version was published before or is lower than the registry's latest. A plugin-only release is therefore a no-op for the registry.
 
 Tagging pushes with the job's own token, so there is no token to create or rotate. It needs one project setting: Settings, CI/CD, Job token permissions, "Allow Git push requests to the repository". Without it the tag job fails and says so.
