@@ -2,6 +2,10 @@
 
 Any change to a tool schema on the server bumps the plugin version, gets a note here for the OpenAI re-review, and is batched into a Cursor release.
 
+## 0.7.2
+
+- The Codex manifest names the icon again: `interface.composerIcon` and `interface.logo` are `./assets/icon.png`, the same 512 px PNG that `plugin.json` names as `icon`. Since 0.3.1 it named no logo file, so ChatGPT desktop and Codex gave the plugin a generated icon when it was added from the marketplace or the repository; only a listing with a logo uploaded in the OpenAI portal showed the SparkleTree logo.
+
 ## 0.7.1
 
 - The session start hook is removed, so the plugin has no hooks. Anthropic's directory accepts command hooks only from Verified organizations. Gone with it: `hooks/hooks.json`, `scripts/check-connector.sh`, `scripts/test-hooks.sh`, the `hooks` entry in the Codex manifest, the health check at session start and the routing line it added to the model's context. `SPARKLETREE_HEALTH_URL` and `SPARKLETREE_SESSION_CONTEXT` have no effect. The `sparkletree` skill still routes requests to the right skill. The plugin now makes no network calls of its own.
