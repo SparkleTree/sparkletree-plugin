@@ -4,7 +4,7 @@ Any change to a tool schema on the server bumps the plugin version, gets a note 
 
 ## 0.7.2
 
-- The Codex manifest names the icon again: `interface.composerIcon` and `interface.logo` are `./assets/icon.png`, the same 512 px PNG that `plugin.json` names as `icon`. Since 0.3.1 it named no logo file, so ChatGPT desktop and Codex gave the plugin a generated icon when it was added from the marketplace or the repository; only a listing with a logo uploaded in the OpenAI portal showed the SparkleTree logo.
+- The Codex manifest names the icon again: `interface.composerIcon` and `interface.logo` name the same 512 px PNG that `plugin.json` names as `icon`. Since 0.3.1 it named no logo file, so ChatGPT desktop and Codex gave the plugin a generated icon when it was added from the marketplace or the repository; only a listing with a logo uploaded in the OpenAI portal showed the SparkleTree logo.
 
 ## 0.7.1
 
