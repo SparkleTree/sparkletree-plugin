@@ -2,6 +2,14 @@
 
 Any change to a tool schema on the server bumps the plugin version, gets a note here for the OpenAI re-review, and is batched into a Cursor release.
 
+## 0.7.3
+
+Registry `server.json` stays at 1.6.1.
+
+- `squid-design` describes `capabilities.live` (`inset`, the default, `main`, `box` or `none`: where a routed live stream plays over a custom design) and `capabilities.commentary` (`standard`, the default, `own` or `none`: where live commentary shows), next to `capabilities.chat`. The hosted server accepts both fields in the `create_component` manifest since monorepo !1709; the registry version did not change with it.
+- New `skills/squid-design/references/live.md`: the rules for a live design and three complete examples (manifest and HTML), one per placement: `main`, `inset`, and `box` with `commentary: "own"`.
+- The tool table lists both fields under `create_component`.
+
 ## 0.7.2
 
 - Registry `server.json` 1.6.1: every tool now states `readOnlyHint`, `destructiveHint` and `openWorldHint` as booleans, and the result cards carry `openai/widgetDomain`, as the ChatGPT Apps directory requires (monorepo !1608). No tool schema changed.
