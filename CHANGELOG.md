@@ -4,9 +4,8 @@ Any change to a tool schema on the server bumps the plugin version, gets a note 
 
 ## 0.7.3
 
-Registry `server.json` stays at 1.6.1.
-
-- `squid-design` describes `capabilities.live` (`inset`, the default, `main`, `box` or `none`: where a routed live stream plays over a custom design) and `capabilities.commentary` (`standard`, the default, `own` or `none`: where live commentary shows), next to `capabilities.chat`. The hosted server accepts both fields in the `create_component` manifest since monorepo !1709; the registry version did not change with it.
+- Registry `server.json` 1.7.0: the `create_component` manifest takes two new optional fields under `capabilities`, `live` (`main`, `inset`, `box`, `none`) and `commentary` (`standard`, `own`, `none`), and its description names them (monorepo !1709). A tool schema changed, so this one is for the OpenAI re-review and the next Cursor release. Nothing was removed or renamed: a manifest without the fields is read as before.
+- `squid-design` describes `capabilities.live` (`inset`, the default, `main`, `box` or `none`: where a routed live stream plays over a custom design) and `capabilities.commentary` (`standard`, the default, `own` or `none`: where live commentary shows), next to `capabilities.chat`. The hosted server accepts both fields in the `create_component` manifest since monorepo !1709.
 - New `skills/squid-design/references/live.md`: the rules for a live design and three complete examples (manifest and HTML), one per placement: `main`, `inset`, and `box` with `commentary: "own"`.
 - The tool table lists both fields under `create_component`.
 
