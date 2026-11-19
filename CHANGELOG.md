@@ -2,6 +2,12 @@
 
 Any change to a tool schema on the server bumps the plugin version, gets a note here for the OpenAI re-review, and is batched into a Cursor release.
 
+## 0.7.6
+
+- Registry `server.json` 1.10.0: `manage_campaigns` `approve_for_social` takes a new optional field, `propose` (monorepo !1722). With it nothing is written and the answer lists every version that is on, with its picture, its mark and whether it is picked. A write's answer gains `campaignId`, `campaignName` and `campaignVersions`. A tool schema changed, so this one is for the OpenAI re-review and the next Cursor release. Nothing was removed or renamed.
+- Cards: the campaigns card draws these answers as a picker of the campaign's versions, and a person's press on Approve in it sets the mark. It is the one card that saves; publish, deploy, delete and spend stay in the conversation. The campaigns card document is `ui://mosaic/campaign-inspector@4`.
+- The tool table describes `propose`, the two lists in the answer and the picker.
+
 ## 0.7.5
 
 - Registry `server.json` 1.9.0: two tools join the default surface, which now has 17 (monorepo !1720). `query_social_schedules` (read: `accounts`, `list`, `get`) lists the connected Facebook Page, Instagram and Bluesky accounts with their `connectionId` and the schedule limits, and reads schedules and each post's status. `manage_social_schedule` (`create`, `add_posts`, `update_post`, `skip_post`, `stop`, `approve`, `retry_post`) proposes posting schedules. A tool schema changed, so this one is for the OpenAI re-review and the next Cursor release. Nothing was removed or renamed for outside connections.
