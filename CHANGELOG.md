@@ -2,6 +2,14 @@
 
 Any change to a tool schema on the server bumps the plugin version, gets a note here for the OpenAI re-review, and is batched into a Cursor release.
 
+## 0.7.8
+
+- Skill `surfaces-and-embed`: the React SDK steps now use the setup commands of `@sparkletree/cli` 0.16.0. `init` registers the site and writes the env file, `add provider` writes a provider for the project's framework, `doctor` checks the key, the site, the campaign and the page's content security policy, and `dev` runs a local mock edge for the degrade test. Signing in stays the user's step: the skill tells the agent to ask for `login` and never to approve it.
+- The skill said the publishable key comes from the dashboard and to use a test key locally, but the dashboard shows the live key only, so an agent on localhost had no way forward. It now names the two sources of a test key: `init`, and `query_brand` `action: get_page` (`devPublishableKey`).
+- The SDK reference gains facts and custom slots, the question box, the agent surface, tests with the mock edge, and reading results back; it points at the docs that ship inside the packages (`npx @sparkletree/cli docs`).
+- A provider copied by 0.15.0 or earlier throws in the browser; the skill says to run `upgrade`.
+- No tool schema changed. Nothing here is for the OpenAI re-review or a Cursor release.
+
 ## 0.7.7
 
 - Registry `server.json` 1.11.0: tool and field descriptions changed; no field was added, removed or renamed. The descriptions changed, so this one is for the OpenAI re-review and the next Cursor release.
