@@ -2,6 +2,14 @@
 
 Any change to a tool schema on the server bumps the plugin version, gets a note here for the OpenAI re-review, and is batched into a Cursor release.
 
+## 0.7.7
+
+- Registry `server.json` 1.11.0: tool and field descriptions changed; no field was added, removed or renamed. The descriptions changed, so this one is for the OpenAI re-review and the next Cursor release.
+- Video first for design posts: a social post made from a version with a custom design carries the design's video (Instagram 9:16 as a Reel, Facebook Page and Bluesky 4:5). In a schedule that is `designMedia: {kind: "video"}` with `variantId`; for a post that goes out now it is one of `design.videos` from `query_campaigns` `action: variants`. The still is the fallback, for when a picture is asked for or a recording is refused or failed. `design` (`videos`, `stillUrl`) is in `action: variants`, not in `get` with `include: variants`, and carries only ready and current recordings.
+- What `stale` means: in `query_video` `action: progress` a ready recording with `stale: true` is out of date, because the variant's copy, slot values or design changed after it, or SparkleTree updated how designs are recorded, which puts every earlier recording out of date. Record it again before a post uses it.
+- Corrected limits and refusals: `render_video` `mode: squid` counts against 100 recordings a day, 300 a week and 1,000 a month per workspace (not 20 a day), and is refused (`precondition_failed`) for a version that is off or archived and while a recording of the version is being made. Each `squidExports` row's `exportId` is what `designMedia.exportIds` takes. A schedule allows at most 3 posts per account on one local date, across all schedules, drafts included. `imageAlt` is optional on Bluesky: left out, the post's text stands in. `removeMedia` does not go together with a new `imageUrl` or `videoUrl`. `stop` now refuses a viewer, as `update_post` and `skip_post` do. `approve_for_social` may take the mark off a version that is off or archived.
+- The tool table, the `sparkletree` skill's steps for social posts, the glossary and `squid-design` say all of this; `squid-design` lists the off or archived refusal and the recording limit in its errors table.
+
 ## 0.7.6
 
 - Registry `server.json` 1.10.0: `manage_campaigns` `approve_for_social` takes a new optional field, `propose` (monorepo !1722). With it nothing is written and the answer lists every version that is on, with its picture, its mark and whether it is picked. A write's answer gains `campaignId`, `campaignName` and `campaignVersions`. A tool schema changed, so this one is for the OpenAI re-review and the next Cursor release. Nothing was removed or renamed.

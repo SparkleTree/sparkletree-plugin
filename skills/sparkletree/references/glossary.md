@@ -22,7 +22,7 @@
 - Reach: distinct SparkleTree sessions that saw the campaign. Per tab, cleared on close. Meta reach is reported separately and never added.
 - CTR (sessions): clicks over sessions reached. The number to compare creatives on.
 - Credits: the workspace's monthly pool for AI generation and AI images. Video renders are not paid in credits; they have daily per-workspace limits. Blocked actions return `precondition_failed`; published campaigns keep serving.
-- Sandbox allowance: the daily count for work that runs in a sandbox browser: design checks, brand page render checks and Squid design videos, 20 each per workspace per day.
+- Sandbox allowance: the count for work that runs in a sandbox browser: design checks and brand page render checks, 20 each per workspace per day, and Squid design videos, 100 a day, 300 a week and 1,000 a month per workspace.
 - Brand site: a brand page version with more files than `index.html` (more pages, CSS, scripts, images).
 - Profile: the set of tools a connection sees. Selected by a call code, not a name. Visibility only, never permission.
 - Call code: the operator-issued secret appended as `?profile=<code>`.

@@ -78,7 +78,7 @@ If the user already approved the HTML, `create_component` with `publish: true` (
 
 ## 8. Record it as a video
 
-For a social clip of a variant that runs a published design: `render_video` `mode: squid` with `campaignId`, `variantId`, optional `formats` (9:16, 4:5, 1:1, 16:9; default 9:16 and 4:5) and `durationS` (3 to 60, default the manifest length). It is recorded in a sandbox, not on the template renderer, and counts against 20 recordings per workspace per day; confirm first. A Starter workspace or one without an active plan cannot record (`forbidden`). Poll `query_video` `action: progress` with the same `campaignId` and `variantId` every 15 to 30 seconds; each row in `squidExports[]` ends `ready` with `videoUrl` and `posterUrl`, or `failed` with an `error`. A 16:9 row may appear that you did not ask for; it is the share video.
+For a social clip of a variant that runs a published design: `render_video` `mode: squid` with `campaignId`, `variantId`, optional `formats` (9:16, 4:5, 1:1, 16:9; default 9:16 and 4:5) and `durationS` (3 to 60, default the manifest length). It is recorded in a sandbox, not on the template renderer, and counts against the workspace's recordings: 100 a day, 300 a week and 1,000 a month; confirm first. A Starter workspace or one without an active plan cannot record (`forbidden`). Poll `query_video` `action: progress` with the same `campaignId` and `variantId` every 15 to 30 seconds; each row in `squidExports[]` ends `ready` with `videoUrl` and `posterUrl`, or `failed` with an `error`. A 16:9 row may appear that you did not ask for; it is the share video. A ready row with `stale: true` is out of date: the variant's copy, slot values or design changed after it, or SparkleTree updated how designs are recorded, which puts every earlier recording out of date. Record it again before a post uses it. A social post made from the variant carries the design's video by default; the still is for when a picture is asked for or a recording is refused or failed.
 
 ## Errors
 
@@ -92,6 +92,8 @@ For a social clip of a variant that runs a published design: `render_video` `mod
 | `precondition_failed` "not available" on `mode: squid` | Design video is switched off on this deployment |
 | `precondition_failed` "publish a custom design" | The variant runs no published design; publish one first |
 | `precondition_failed` in flight | A recording is already running; poll it |
+| `precondition_failed` "off" or "archived" on `mode: squid` | The version is switched off or archived, so nothing is recorded for it. Switch it on or restore it first |
+| `precondition_failed` on `mode: squid`, limit | The workspace's recordings for the day, week or month are used up; the message says which and when more can be made |
 | `squid_shape_not_v2` | The campaign uses the old Squid shape; the remedy says how to switch (`update` with `shape: "v2"`) |
 | `squid_conversation_off`, `squid_answers_off`, `squid_answers_preview_only`, `squid_copy_card_no_style` | The campaign is on V2 but its copy card does not show; `update` with `conversation: {enabled: true}` fixes it |
 | `squid_copy_card_no_placeholder`, `squid_copy_card_no_copy` | The question box has no text, or the variant has no headline and body; the remedy names the field |
