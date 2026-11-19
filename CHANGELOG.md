@@ -2,6 +2,13 @@
 
 Any change to a tool schema on the server bumps the plugin version, gets a note here for the OpenAI re-review, and is batched into a Cursor release.
 
+## 0.7.5
+
+- Registry `server.json` 1.9.0: two tools join the default surface, which now has 17 (monorepo !1720). `query_social_schedules` (read: `accounts`, `list`, `get`) lists the connected Facebook Page, Instagram and Bluesky accounts with their `connectionId` and the schedule limits, and reads schedules and each post's status. `manage_social_schedule` (`create`, `add_posts`, `update_post`, `skip_post`, `stop`, `approve`, `retry_post`) proposes posting schedules. A tool schema changed, so this one is for the OpenAI re-review and the next Cursor release. Nothing was removed or renamed for outside connections.
+- An agent proposes social posts and a person approves them: from an outside connection `approve`, `retry_post` and changing an approved post answer the new error code `approval_required`, and a person approves on the Agent page under Scheduled posts. A workspace admin can allow outside agents to do these steps with the switch "Outside agents approve posts" on the Agent page, under Florence actions; it is off by default and separate from Florence's own mode and switches. `query_social_schedules` `accounts` reports it as `outsideAgentsMayApprove`, and the `approval_required` message names the switch. The skills call `approve` only when it is true and the person has said yes to that exact schedule, and never suggest turning it on.
+- The tool table lists both tools and has a section on social post schedules (actions, fields, media, limits, statuses, approval). The `sparkletree` skill has the steps for planning posts, the approval rule and the `approval_required` code; `adapt` points scheduled social posts there.
+- `campaign-reviewer` and `analytics-digest` block `manage_social_schedule`; `query_social_schedules` stays allowed.
+
 ## 0.7.4
 
 - Registry `server.json` 1.8.0: `manage_campaigns` has a new action, `approve_for_social` (`campaignId`, `variantIds`, optional `approved` and `note`), which sets or clears the "Approved for socials" mark on up to 20 versions in one call (monorepo !1717). A tool schema changed, so this one is for the OpenAI re-review and the next Cursor release. Nothing was removed or renamed.

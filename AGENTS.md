@@ -27,7 +27,7 @@ Layout (only `plugin.json` and `marketplace.json` live in `.claude-plugin/`; eve
 
 ## Tool names
 
-The skills are written for the 15-tool `external_default` surface. Every client, Anthropic's plugin directory included, connects to the same server URL; there is no separate directory server or branch. Verify against `mosaic/lib/mcp/toolGates.ts` and `mosaic/tests/mcp/manifest-external-surface.test.ts` in the monorepo before changing a tool name here, and against the handler (`mosaic/lib/mcp/*Consolidated.ts`, `squidTemplates.ts`, `squidComponentChecks.ts`) before writing what an action does, costs or needs.
+The skills are written for the 17-tool `external_default` surface. Every client, Anthropic's plugin directory included, connects to the same server URL; there is no separate directory server or branch. Verify against `mosaic/lib/mcp/toolGates.ts` and `mosaic/tests/mcp/manifest-external-surface.test.ts` in the monorepo before changing a tool name here, and against the handler (`mosaic/lib/mcp/*Consolidated.ts`, `squidTemplates.ts`, `squidComponentChecks.ts`, `socialSchedules.ts`) before writing what an action does, costs or needs.
 
 ## Checks before a commit
 

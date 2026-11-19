@@ -1,6 +1,6 @@
 # The default tool surface
 
-Fifteen tools on the bare URL (`external_default`). Reads and writes never share a tool. Every tool takes one flat input with a discriminator (`action`, `mode`, `operation` or `topic`); the handler checks the fields for that action and answers `invalid_input` naming the bad ones. `organizationId` is optional everywhere and comes from the sign-in. Verified against the server source on 2026-10-15 (monorepo main 4be3e1bed, plus the final 1.0.3 change that moved `check_component` and `match_templates` to `manage_campaigns`), and the 1.0.4 `query_analytics` `siteActivity` section (monorepo !1464, 2026-10-16). Tool list checked again for server 1.0.5 (2026-10-17).
+Seventeen tools on the bare URL (`external_default`). Reads and writes never share a tool. Every tool takes one flat input with a discriminator (`action`, `mode`, `operation` or `topic`); the handler checks the fields for that action and answers `invalid_input` naming the bad ones. `organizationId` is optional everywhere and comes from the sign-in. Verified against the server source on 2026-10-15 (monorepo main 4be3e1bed, plus the final 1.0.3 change that moved `check_component` and `match_templates` to `manage_campaigns`), and the 1.0.4 `query_analytics` `siteActivity` section (monorepo !1464, 2026-10-16). Tool list checked again for server 1.0.5 (2026-10-17). `query_social_schedules` and `manage_social_schedule` checked against server 1.9.0 (monorepo !1720, commit 2c6f91890, 2026-11-19), which added both tools.
 
 | Tool | Read or write | Actions | Notes |
 |---|---|---|---|
@@ -19,6 +19,8 @@ Fifteen tools on the bare URL (`external_default`). Reads and writes never share
 | `query_analytics` | read | `action: snapshot, export, ab_test, cvg_dashboard, insights` | `snapshot` needs `startDate`, `endDate`; `sections` default `["summary"]`, others timeseries, funnel, cohorts, abTests, insights, products, breakdowns, spend (plan gated; fails the whole call without it), video, live, creatives (`creativesLimit` 1 to 200, default 50), siteActivity (`siteActivityBreakdown: {kind, property, limit?}` for one property's values). `export` takes `includeCreatives`. Window caps: hourly 14 days, daily 366. See below |
 | `query_video` | read | `action: templates, progress, renders` | `templates` with `templateId` (logo-reveal, kinetic-promo, lightscribe) expands its props. `progress` takes one of: `campaignVideoRenderId`; `renderId` plus `bucketName`; `campaignId` plus `variantId` (Squid design exports) |
 | `render_video` | write, daily limit | `mode: video, campaign, still, squid` | `video`, `campaign` and `still` render within a daily per-workspace limit; `squid` is recorded in a sandbox. See below |
+| `query_social_schedules` | read | `action: accounts, list, get` | `accounts`: the connected Facebook Page, Instagram and Bluesky accounts with the `connectionId` a schedule's `channels` take, and the schedule limits. `list` and `get`: schedules with their posts and each post's status. See "Social post schedules" below |
+| `manage_social_schedule` | write | `action: create, add_posts, update_post, skip_post, stop, approve, retry_post` | Annotated destructive. An agent proposes a schedule; nothing is posted until a person approves it. From this connection `approve`, `retry_post` and changing an approved post answer `approval_required` unless the workspace allows outside agents to approve. See "Social post schedules" below |
 
 ## manage_campaigns
 
@@ -143,6 +145,50 @@ Pass the `assetId` to the field that takes one: `manage_products` `imageAssetId`
 | `campaign` | `campaignId`, optional `variantId`, `aspect` (16:9, 9:16, 1:1), `quality` | Without `variantId`, up to four active variants. Returns `campaignVideoRenderId` per variant |
 | `squid` | `campaignId`, `variantId`, optional `formats` (9:16, 4:5, 1:1, 16:9), `durationS` (3 to 60) | Records a variant that runs a published custom design in a sandbox, not on the template renderer. 20 runs per workspace per day. A Starter workspace or one without an active plan gets `forbidden`; `upstream_error` means the plan lookup failed and nothing was queued. Poll `query_video` `progress` with `campaignId` and `variantId`; results are `squidExports[]`. Off on some deployments (`precondition_failed`, "not available") |
 
+## Social post schedules
+
+Posting schedules for a Facebook Page, Instagram and Bluesky. An agent on this connection proposes a schedule; a person approves it in SparkleTree. One plan is one schedule: several posts a day go in `timesOfDay`, and posts that differ per account or come later go in the same schedule with `add_posts`. Create a new schedule only for a separate plan.
+
+`query_social_schedules`:
+
+| Action | Needs | Notes |
+|---|---|---|
+| `accounts` | nothing | Each connected account: `platform` (`facebook_page`, `instagram`, `bluesky`), `connectionId`, `name`, `handle` (null for a Facebook Page), `active`, and `canPost` (active and allowed to post now). A Facebook Page and its linked Instagram account share one `connectionId`. Also `limits`: `postsPerAccountPerDay`, `timesPerDay`, `scheduleDays`, and `outsideAgentsMayApprove`: whether this workspace lets agents on an outside connection approve schedules, send posts again and change approved posts (off by default). Use accounts with `canPost: true` |
+| `list` | nothing | Open schedules, newest first. `includeClosed: true` adds stopped and finished ones; `campaignId` narrows to one campaign |
+| `get` | `scheduleId` | One schedule with every post |
+
+A schedule carries `status` (`proposed`, `approved`, `stopped`, `finished`), `timeZone`, `revision`, `firstPostLocalTime` and `waitingForApproval` (drafts still ahead). Each post carries `localTime` (the owner's local time, ready to repeat as given), `platform`, `status`, its text and media, `campaignId`, `variantId` and `lastError`. Post statuses: `draft` (waits for approval), `scheduled` (approved, waits for its time), `publishing`, `published`, `failed`, `outcome_unknown` (the platform never answered; nothing retries it without the owner), `skipped`, `cancelled`.
+
+`manage_social_schedule`:
+
+| Action | Needs | Notes |
+|---|---|---|
+| `create` | `channels`, `posts`, and either `startInMinutes` or `rule` (`once`, `daily`, `weekly`) with `timeOfDay` or `timesOfDay` | Any role but viewer. `channels` is `[{platform, connectionId}]` from `accounts`; every post goes to each account. Optional `title` (120 characters), `campaignId`, `weekdays` (weekly; 0 is Sunday, 6 is Saturday), `startsOn` (`YYYY-MM-DD`, local; default tomorrow), `occurrences` (dates; default 1), `timeZone` (IANA, for example `America/Chicago`; default the zone of the workspace's places; with neither, ask the person, since the call is refused unless it uses `startInMinutes`). Times are local `HH:MM`, 24-hour. `startInMinutes` places one post that many minutes from now. Writes every post now as a draft and returns a proposed schedule: nothing is posted. The same create sent again within a few minutes returns the first schedule with `alreadyCreated: true` |
+| `add_posts` | `scheduleId`, `posts`, and the same timing as `create` | Any role but viewer. Optional `channels` (default the schedule's own accounts). Times are in the schedule's time zone. On an approved schedule the added posts wait for approval and the approved posts keep going out. `alreadyAdded: true` means the same posts were there already |
+| `update_post` | `postId` | Any role but viewer. Changes `message`, `imageUrl`, `imageAlt`, `videoUrl`, `link`, `localDate` or `timeOfDay` of one post. `removeMedia: true` takes its picture or video off (not on Instagram, which needs one). From this connection only a post that waits for approval can change, unless `outsideAgentsMayApprove` is true; otherwise an approved post answers `approval_required` |
+| `skip_post` | `postId` | Any role but viewer. Holds one post back |
+| `stop` | `scheduleId` | Cancels the posts not yet out. `draftsOnly: true` cancels only the posts that wait for approval |
+| `approve` | `scheduleId`, optional `revision` | Editor or above. Makes the schedule's posts go out at their times. From this connection it answers `approval_required` unless `outsideAgentsMayApprove` is true (see below). `revision` from the last read refuses the approve when the schedule changed since |
+| `retry_post` | `postId`, optional `confirmedNotPosted` | Editor or above. Sends a `failed` or `outcome_unknown` post again; for `outcome_unknown` a person first checks the account. From this connection it answers `approval_required` unless `outsideAgentsMayApprove` is true |
+
+`onlyWhileProposed: true` on `update_post`, `skip_post` and `stop` refuses the change once the schedule is approved.
+
+Each post in `posts`: `message` (2,200 characters at most; 300 on Bluesky; the caption on Instagram), and at most one of `imageUrl`, `videoUrl` or `designMedia`, plus optional `imageAlt` (Bluesky needs it), `link` (Facebook text posts only), `campaignId` and `variantId`. Fewer posts than places repeat in turn; posts are placed date by date, and on each date time by time. Instagram posts need an image or a video. Always pass `variantId` when a post comes from a version: the post is tied to that version and checked against it, and a version that is switched off is refused.
+
+Media on a post:
+
+- The version's own picture or video: `imageUrl` or `videoUrl` from `query_campaigns` `action: variants`. For a version with a custom design, a picture given while a recording of the design is ready is replaced by the design's still (`mediaReplaced` in the answer); write `imageAlt` for the still.
+- A file of the owner's: store it with `upload_asset` and pass its `asset.url` as `imageUrl` or `videoUrl` (MP4). Bluesky takes video up to 100 MB and 3 minutes; a video it cannot take is refused at `create` with the reason.
+- The version's design video or still: `designMedia: {kind: "video" or "still", exportIds?}` with `variantId`. The recordings come from `render_video` `mode: squid` (a sandbox allowance; confirm first). Each account gets the format it shows best: Facebook Page 4:5, Instagram 9:16 as a Reel, Bluesky 4:5. A recording still being made is fine: the post gets its file when it is ready. A post whose file is not ready at its time is held, never sent with something else, and the owner is told. Refused when the version has no recording ready or being made.
+
+The answer to `create` and `add_posts` says what each post shows (`draftMedia`, `posts[].media`: design video, design still, or the version's own picture) and how many different pictures each platform's posts show (`pictures`). Tell the person both.
+
+Limits: at most 3 scheduled posts per account per day, at most 3 times a day in `timesOfDay`, and a schedule spans at most 90 days. Over a limit the answer is `precondition_failed`.
+
+Approval: a person approves on the Agent page under Scheduled posts (`/dashboard/agent`), or in the phone app under Florence, Scheduled posts. From this connection, `approve`, `retry_post` and `update_post` on an approved post answer `approval_required` and change nothing, unless the workspace allows outside agents to do them. A workspace admin allows it on the Agent page, under Florence actions, with the switch "Outside agents approve posts". It is off by default and separate from Florence's own mode and switches; `accounts` reports it as `outsideAgentsMayApprove`. When it is true, call `approve` only after the person has said yes in the conversation to that exact schedule, with its dates, times, accounts and posts shown first. When it is false, do not call `approve` and do not retry; say where the person approves, and name the switch only if the person asks how to let the agent approve. Never suggest turning it on unprompted. Once approved, each post goes out at its time, within 5 minutes, with no further step.
+
+Other answers: `not_found` for a schedule or post outside the workspace; `forbidden` for a viewer, or a role below editor on `approve` and `retry_post`; `precondition_failed` when a limit is reached, an account is not connected, or the schedule changed or is closed (`details.code` says which).
+
 ## The generate_campaign intent
 
 ```json
@@ -173,7 +219,7 @@ At least one product must resolve; list products first with `query_products` `ac
 
 ## Resources and prompts
 
-Resources: `mosaic://capabilities` (tools, prompts and the recommended call order for product images, manual and AI campaigns, the brand page, brand sites, Squid designs and Squid templates), `mosaic://brand-page-guide`, `mosaic://campaigns/{id}/squid-component-guide` (the same guide `get_component` returns), `mosaic://org/{id}`, `mosaic://org/{id}/brand-guidelines`, `mosaic://campaigns/{id}`, `mosaic://products/{id}`, `mosaic://surfaces/{id}`, and `ui://mosaic/campaign-inspector@2`, the campaign inspector that hosts with MCP Apps render for `query_campaigns` and `generate_campaign`.
+Resources: `mosaic://capabilities` (tools, prompts and the recommended call order for product images, manual and AI campaigns, the brand page, brand sites, Squid designs, Squid templates and social post schedules), `mosaic://brand-page-guide`, `mosaic://campaigns/{id}/squid-component-guide` (the same guide `get_component` returns), `mosaic://org/{id}`, `mosaic://org/{id}/brand-guidelines`, `mosaic://campaigns/{id}`, `mosaic://products/{id}`, `mosaic://surfaces/{id}`, and `ui://mosaic/campaign-inspector@2`, the campaign inspector that hosts with MCP Apps render for `query_campaigns` and `generate_campaign`.
 
 Prompts on the default profile: `campaign_brief` (titled Create Campaign Plan; goal, brandName, targetAudience, budget), `analytics_deep_dive`, `surface_network_planner`, `content_optimizer`, `platform_onboarding`. The prompt list in `mosaic://capabilities` names exactly the prompts the connection's profile serves.
 

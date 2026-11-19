@@ -1,6 +1,6 @@
 ---
 name: sparkletree
-description: SparkleTree rules for any request that touches a SparkleTree workspace or calls a SparkleTree tool (campaigns, variants, Squids, products, brand, surfaces, video, analytics). Load before the first SparkleTree tool call. Covers which workspace you are in, read before write, confirm before spend or live changes, async polling, error codes, and which SparkleTree skill fits the task.
+description: SparkleTree rules for any request that touches a SparkleTree workspace or calls a SparkleTree tool (campaigns, variants, Squids, products, brand, surfaces, video, analytics, social post schedules). Load before the first SparkleTree tool call. Covers which workspace you are in, read before write, confirm before spend or live changes, async polling, error codes, and which SparkleTree skill fits the task.
 ---
 
 # SparkleTree orientation
@@ -23,6 +23,7 @@ The MCP server is `https://app.sparkletree.io/api/mcp`. Every tool runs as the s
 | A video from a campaign or template | `video` |
 | Website embed, React SDK, screens, kiosks, zones, QR | `surfaces-and-embed` |
 | Change live copy from one sentence, once or on a schedule | `adapt` |
+| Schedule social posts: plan a week of posts for a campaign on Facebook, Instagram or Bluesky | This skill, "Social post schedules" below |
 | Several client workspaces, API keys, call codes | `agency-workspaces` |
 | 401, sign-in loops, missing tools, 429 | `troubleshoot-connection` |
 
@@ -34,7 +35,7 @@ The MCP server is `https://app.sparkletree.io/api/mcp`. Every tool runs as the s
 
 ## Read before write
 
-Never change what you have not read in this session. Before any `manage_*` call, fetch the current state with the matching `query_*` tool (`query_campaigns`, `query_products`, `query_surfaces`, `query_brand`, `query_analytics`, `query_video`, `query_assets`). Show the user what exists and what will change.
+Never change what you have not read in this session. Before any `manage_*` call, fetch the current state with the matching `query_*` tool (`query_campaigns`, `query_products`, `query_surfaces`, `query_brand`, `query_analytics`, `query_video`, `query_assets`, `query_social_schedules`). Show the user what exists and what will change.
 
 ## Confirm before spend or live changes
 
@@ -43,13 +44,26 @@ Tools with `readOnlyHint: true` spend no credits and change nothing. Two `manage
 - Credit spend, paid inference or video renders: `generate_campaign` (both modes; the credits for its AI images are set aside when it starts), `render_video` modes video, campaign and still (daily render limit), `manage_products` `import_from_url`, `manage_campaigns` `generate_playbook`.
 - Daily sandbox or model allowances: `render_video` `mode: squid`, `manage_brand` `render_check`, and `manage_campaigns` `check_component` and `match_templates`.
 - Quota: `manage_products` create and imports, `manage_campaigns` `duplicate`, `manage_surfaces` `create_surface`.
-- Live changes and deletes: `manage_campaigns` publish, deploy, delete, delete_variant, update_deployment, `create_share_link`, `revoke_share_link`, `publish_component`, `revert_component`, `create_component` or `apply_template` with `publish: true`, and `update` to `status: "active"`; `update_variant` on a live campaign (saves republish immediately); `manage_brand` brand data writes (`update_*`, `set_logo`), `publish_page`, `revert_page`, `delete_page`, `delete_files`, and `create_page` or `edit_page` with `publish: true`; `manage_surfaces`; `manage_products` update and delete.
+- Live changes and deletes: `manage_campaigns` publish, deploy, delete, delete_variant, update_deployment, `create_share_link`, `revoke_share_link`, `publish_component`, `revert_component`, `create_component` or `apply_template` with `publish: true`, and `update` to `status: "active"`; `update_variant` on a live campaign (saves republish immediately); `manage_brand` brand data writes (`update_*`, `set_logo`), `publish_page`, `revert_page`, `delete_page`, `delete_files`, and `create_page` or `edit_page` with `publish: true`; `manage_surfaces`; `manage_products` update and delete; `manage_social_schedule` `stop` and `skip_post`.
 
-Drafts need no extra yes beyond the user's request: `manage_brand` `create_page` and `edit_page` without `publish`, `create_version`, `put_files`, `create_file_upload`, and `manage_campaigns` `create_component` and `apply_template` without `publish`. Show the preview URL afterwards.
+An agent proposes social posts and a person approves them. `manage_social_schedule` `create` and `add_posts` write drafts that post nothing. From this connection `approve`, `retry_post` and changing an approved post answer `approval_required` unless the workspace allows outside agents to approve: `query_social_schedules` `action: accounts` reports it as `outsideAgentsMayApprove` (off by default). When it is false, the person approves in SparkleTree and a yes in chat does not approve a schedule. When it is true, call `approve` only after the person has said yes in this conversation to that exact schedule, with its dates, times, accounts and posts shown first. Never suggest turning on the switch that allows it; name it ("Outside agents approve posts", on the Agent page under Florence actions, set by an admin) only if the person asks how to let the agent approve.
+
+Drafts need no extra yes beyond the user's request: `manage_brand` `create_page` and `edit_page` without `publish`, `create_version`, `put_files`, `create_file_upload`, and `manage_campaigns` `create_component` and `apply_template` without `publish`. Show the preview URL afterwards. The same holds for a proposed social schedule: `manage_social_schedule` `create`, `add_posts`, and `update_post` on a post that waits for approval. Show the dates, times, accounts and posts afterwards.
 
 State the exact call, the target by name and id, and who pays (the workspace's monthly credit pool or the daily allowance). Then wait. Nothing else asks for you: the yes in chat is the confirmation. `manage_brand` is annotated destructive, so some hosts also ask before every `manage_brand` call, drafts included. When the server refuses a call, its error names the reason and the remedy (see Errors below).
 
 `upload_asset` only stores a file in the workspace (`from_url`, `from_data`, or `create_upload` then `complete_upload` for a local or large file). It needs no confirmation beyond the user having asked for the file to be used. `query_assets` lists what is already stored, so check it before uploading the same file again.
+
+## Social post schedules
+
+For "plan a week of posts for this campaign" or "schedule posts". Fields, limits and statuses: "Social post schedules" in `references/tools.md`.
+
+1. `query_social_schedules` `action: accounts`. Use the accounts with `canPost: true` and their `connectionId`, and note `outsideAgentsMayApprove`. With none, tell the person to connect an account in SparkleTree and stop. Note the limits: 3 posts per account per day, 3 times a day, 90 days per schedule.
+2. `query_social_schedules` `action: list` with the `campaignId`, to see whether a schedule for this plan already exists. Add to it with `add_posts` rather than making a second one.
+3. `query_campaigns` `action: variants` for the campaign. Pick the active versions to use, spread so pictures do not repeat, and take each post's text and media from them: the version's own `imageUrl` or `videoUrl`, a file stored with `upload_asset`, or `designMedia` for a version's design video or still (recorded with `render_video` `mode: squid`, which needs a yes first). Pass `variantId` and `campaignId` on every post. Never invent offers or prices.
+4. `manage_social_schedule` `action: create` with `channels`, `posts`, `rule`, `timeOfDay` or `timesOfDay`, `startsOn` and `occurrences` (for a week of daily posts: `rule: "daily"`, `occurrences: 7`). Accounts that need other posts, such as a Facebook link post next to an Instagram picture post, go in the same schedule with `add_posts` and its `scheduleId`. This is a proposal: nothing is posted.
+5. Show the person the dates and local times as the answer gives them (`firstPostLocalTime`, `posts[].localTime`), the accounts, the text of each post and what each post shows (`draftMedia`), and say when posts repeat a picture (`pictures`).
+6. Tell them the posts go out only after the schedule is approved. If `outsideAgentsMayApprove` is false, tell them to approve it in SparkleTree on the Agent page under Scheduled posts, and do not call `approve`. If it is true, ask whether to approve this schedule; call `approve` with `scheduleId` and the `revision` you read only after their yes. Afterwards `query_social_schedules` `action: get` shows each post's status.
 
 ## Async jobs
 
@@ -72,12 +86,13 @@ Every error is `{error: {code, message, remedy, details}}`. Read the remedy befo
 | `not_configured` | The feature is switched off on this deployment (for example the Squid template library) | Say it is not available yet and offer the alternative; not a bug, do not retry |
 | `upstream_error` | A site, store or render service failed | Retry once later; for imports read `details.reason` |
 | `analytics_window_too_large` | Range too long for the granularity | Narrow the range or coarsen the granularity |
+| `approval_required` | The step makes social posts go out or changes an approved post (`manage_social_schedule` `approve`, `retry_post`, `update_post` on an approved post), and that stays with a person | Tell the person the posts wait for their approval on the Agent page under Scheduled posts in SparkleTree; do not retry. The message also names the switch "Outside agents approve posts"; mention it only if the person asks how to let the agent approve |
 
 HTTP `401`: run the OAuth sign-in again (`troubleshoot-connection`). `429`: back off; the limit is 120 requests per minute per token. A signed-in user without a workspace creates one at https://app.sparkletree.io/sign-up.
 
 ## Profiles and call codes
 
-The bare URL serves the `external_default` profile (the 15 tools in `references/tools.md`). Other profiles are selected with `?profile=<call-code>`, where the call code is a secret the workspace operator hands out; profile names are rejected and fall back to a two-tool minimal profile. Profiles change visibility, not permission.
+The bare URL serves the `external_default` profile (the 17 tools in `references/tools.md`). Other profiles are selected with `?profile=<call-code>`, where the call code is a secret the workspace operator hands out; profile names are rejected and fall back to a two-tool minimal profile. Profiles change visibility, not permission.
 
 ## Where the inspector appears
 
@@ -85,5 +100,5 @@ On hosts that support MCP Apps (Claude.ai, Claude desktop, ChatGPT), `query_camp
 
 ## References
 
-- `references/tools.md`: the 15 default tools, their actions, roles and costs.
+- `references/tools.md`: the 17 default tools, their actions, roles and costs.
 - `references/glossary.md`: SparkleTree terms.
