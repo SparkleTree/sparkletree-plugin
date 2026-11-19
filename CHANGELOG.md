@@ -2,6 +2,11 @@
 
 Any change to a tool schema on the server bumps the plugin version, gets a note here for the OpenAI re-review, and is batched into a Cursor release.
 
+## 0.7.4
+
+- Registry `server.json` 1.8.0: `manage_campaigns` has a new action, `approve_for_social` (`campaignId`, `variantIds`, optional `approved` and `note`), which sets or clears the "Approved for socials" mark on up to 20 versions in one call (monorepo !1717). A tool schema changed, so this one is for the OpenAI re-review and the next Cursor release. Nothing was removed or renamed.
+- The tool table lists `approve_for_social` under `manage_campaigns`.
+
 ## 0.7.3
 
 - Registry `server.json` 1.7.0: the `create_component` manifest takes two new optional fields under `capabilities`, `live` (`main`, `inset`, `box`, `none`) and `commentary` (`standard`, `own`, `none`), and its description names them (monorepo !1709). A tool schema changed, so this one is for the OpenAI re-review and the next Cursor release. Nothing was removed or renamed: a manifest without the fields is read as before.
